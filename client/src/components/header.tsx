@@ -14,10 +14,11 @@ export default function Header() {
 
   useEffect(() => {
     // Check if user is logged in on component mount
-    const token = localStorage.getItem("token")
+    const data = localStorage.getItem("data")
     const storedUsername = localStorage.getItem("username")
+    console.log(storedUsername)
 
-    if (token && storedUsername) {
+    if (data && storedUsername) {
       setUsername(storedUsername)
     }
   }, [])

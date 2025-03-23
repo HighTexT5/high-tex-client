@@ -60,20 +60,21 @@ export default function LoginPage() {
       })
 
       // Safely parse the JSON response
-      const data = await safeParseJSON(response)
+      const d = await safeParseJSON(response)
 
       if (!response.ok) {
-        throw new Error(data.message || "Đăng nhập thất bại")
+        throw new Error(d.message || "Đăng nhập thất bại")
       }
 
       // Store auth token if provided
-      if (data.token) {
-        localStorage.setItem("token", data.token)
-        console.log('token retrived');
+      if (d.data) {
+        localStorage.setItem("data", d.data)
+        console.log('token, user and role retrived')
         // Store username for display in header
-        localStorage.setItem("username", username)
+        localStorage.setItem("username", d.data.username) 
       } else {
-        console.log('token not retrieved');
+        //for logging-only purpose
+        console.log('token, user and role not retrieved')
       }
 
       // Redirect to home page after successful login
