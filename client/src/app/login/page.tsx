@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Eye, EyeOff } from "lucide-react"
+import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -17,8 +17,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     // Basic validation
@@ -27,9 +28,43 @@ export default function LoginPage() {
       return
     }
 
-    // In a real app, you would authenticate with a backend here
-    // For demo purposes, we'll just redirect to the home page
-    router.push("/")
+    setIsLoading(true)
+    setError("")
+
+    try {
+      // Create timestamp for the request
+      const timestamp = new Date().toISOString()
+
+      const response = await fetch("http://localhost:8080/api/user/sign-in", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+          timestamp,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Đăng nhập thất bại")
+      }
+
+      const data = await response.json()
+
+      // Store auth token or user data if needed
+      localStorage.setItem('token', data.token)
+
+      // Redirect to home page after successful login
+      router.push("/")
+    } catch (err) {
+      console.error("Login error:", err)
+      setError(err instanceof Error ? err.message : "Đăng nhập thất bại, vui lòng thử lại")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -53,6 +88,7 @@ export default function LoginPage() {
                 placeholder="Nhập tên đăng nhập"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                disabled={isLoading}
               />
             </div>
 
@@ -65,6 +101,7 @@ export default function LoginPage() {
                   placeholder="Nhập mật khẩu"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  disabled={isLoading}
                 />
                 <Button
                   type="button"
@@ -72,14 +109,22 @@ export default function LoginPage() {
                   size="icon"
                   className="absolute right-0 top-0 h-full"
                   onClick={() => setShowPassword(!showPassword)}
+                  disabled={isLoading}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
             </div>
 
-            <Button type="submit" className="w-full bg-accent text-black hover:bg-accent/90">
-              Đăng nhập
+            <Button type="submit" className="w-full bg-accent text-black hover:bg-accent/90" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Đang xử lý...
+                </>
+              ) : (
+                "Đăng nhập"
+              )}
             </Button>
           </form>
         </CardContent>
