@@ -1,13 +1,26 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Search, ShoppingCart } from "lucide-react"
+import { Search, ShoppingCart, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useRouter } from "next/navigation"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 export default function Header() {
   const router = useRouter()
+  const [username, setUsername] = useState<string | null>(null)
+
+  useEffect(() => {
+    // Check if user is logged in on component mount
+    const token = localStorage.getItem("token")
+    const storedUsername = localStorage.getItem("username")
+
+    if (token && storedUsername) {
+      setUsername(storedUsername)
+    }
+  }, [])
 
   const handleCartClick = () => {
     router.push("/cart")
@@ -15,6 +28,16 @@ export default function Header() {
 
   const handleLoginClick = () => {
     router.push("/login")
+  }
+
+  const handleLogout = () => {
+    // Clear auth data
+    localStorage.removeItem("token")
+    localStorage.removeItem("username")
+    setUsername(null)
+
+    // Redirect to home page
+    router.push("/")
   }
 
   return (
@@ -53,9 +76,26 @@ export default function Header() {
         >
           <ShoppingCart className="h-5 w-5" />
         </Button>
-        <Button variant="outline" className="bg-accent text-black border-accent h-9" onClick={handleLoginClick}>
-          Đăng nhập
-        </Button>
+
+        {username ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="bg-accent text-black border-accent h-9">
+                {username}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Đăng xuất</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <Button variant="outline" className="bg-accent text-black border-accent h-9" onClick={handleLoginClick}>
+            Đăng nhập
+          </Button>
+        )}
       </div>
     </header>
   )

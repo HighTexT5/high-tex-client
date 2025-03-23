@@ -19,6 +19,17 @@ export default function LoginPage() {
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
+  // Helper function to safely parse JSON responses
+  const safeParseJSON = async (response: Response) => {
+    const text = await response.text()
+    try {
+      return JSON.parse(text)
+    } catch (e) {
+      console.error("Failed to parse response as JSON:", text.substring(0, 100) + "...")
+      throw new Error("Server returned an invalid response")
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -35,6 +46,7 @@ export default function LoginPage() {
       // Create timestamp for the request
       const timestamp = new Date().toISOString()
 
+      // Call the actual API endpoint for user login
       const response = await fetch("http://localhost:8080/api/user/sign-in", {
         method: "POST",
         headers: {
@@ -47,15 +59,22 @@ export default function LoginPage() {
         }),
       })
 
+      // Safely parse the JSON response
+      const data = await safeParseJSON(response)
+
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Đăng nhập thất bại")
+        throw new Error(data.message || "Đăng nhập thất bại")
       }
 
-      const data = await response.json()
-
-      // Store auth token or user data if needed
-      localStorage.setItem('token', data.token)
+      // Store auth token if provided
+      if (data.token) {
+        localStorage.setItem("token", data.token)
+        console.log('token retrived');
+        // Store username for display in header
+        localStorage.setItem("username", username)
+      } else {
+        console.log('token not retrieved');
+      }
 
       // Redirect to home page after successful login
       router.push("/")
