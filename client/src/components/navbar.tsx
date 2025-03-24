@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import NavDropdown from "./nav-dropdown"
 
 // Sample data for dropdown menus
@@ -265,9 +266,16 @@ const navCategories = [
 ]
 
 export default function Navbar() {
+  const pathname = usePathname()
+
+  // Don't render navbar on seller page
+  if (pathname.startsWith("/seller")) {
+    return null
+  }
+
   return (
-    <nav className="bg-primary text-white relative z-10">
-      <div className="container mx-auto flex">
+    <nav className="bg-primary text-white relative z-10 w-full">
+      <div className="flex w-full">
         {navCategories.map((category, index) => (
           <div key={index} className="group static">
             <Link

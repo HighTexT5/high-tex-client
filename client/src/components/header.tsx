@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { Search, ShoppingCart, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,18 +11,25 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 export default function Header() {
   const router = useRouter()
+  const pathname = usePathname()
   const [username, setUsername] = useState<string | null>(null)
+  const [shouldRender, setShouldRender] = useState(true)
 
   useEffect(() => {
-    // Check if user is logged in on component mount
-    const data = localStorage.getItem("data")
-    const storedUsername = localStorage.getItem("username")
-    console.log(storedUsername)
+    if (pathname.startsWith("/seller")) {
+      setShouldRender(false)
+      return
+    }
+    setShouldRender(true)
 
-    if (data && storedUsername) {
+    // Check if user is logged in on component mount
+    const token = localStorage.getItem("token")
+    const storedUsername = localStorage.getItem("username")
+
+    if (token && storedUsername) {
       setUsername(storedUsername)
     }
-  }, [])
+  }, [pathname])
 
   const handleCartClick = () => {
     router.push("/cart")
@@ -41,6 +49,14 @@ export default function Header() {
     router.push("/")
   }
 
+  const handleSellerClick = () => {
+    router.push("/seller")
+  }
+
+  if (!shouldRender) {
+    return null
+  }
+
   return (
     <header className="bg-white p-4 flex items-center justify-between">
       <div className="flex items-center">
@@ -51,7 +67,11 @@ export default function Header() {
           <span className="text-dark-blue text-2xl font-bold">HighTEx</span>
         </Link>
 
-        <Button variant="outline" className="mr-2 bg-white border-gray-300 text-black text-sm h-9">
+        <Button
+          variant="outline"
+          className="mr-2 bg-white border-gray-300 text-black text-sm h-9"
+          onClick={handleSellerClick}
+        >
           Kênh người bán
         </Button>
       </div>
