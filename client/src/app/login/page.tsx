@@ -72,10 +72,14 @@ export default function LoginPage() {
         console.log('token, user and role retrived')
         // Store username for display in header
         localStorage.setItem("username", d.data.username) 
+        console.log(username)
       } else {
         //for logging-only purpose
         console.log('token, user and role not retrieved')
       }
+
+      // Dispatch a storage event to notify other components
+      window.dispatchEvent(new Event("storage"))
 
       // Redirect to home page after successful login
       router.push("/")
