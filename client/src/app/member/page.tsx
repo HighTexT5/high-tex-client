@@ -27,6 +27,13 @@ export default function MemberPage() {
   const [shopEmail, setShopEmail] = useState("")
   const [shopTaxCode, setShopTaxCode] = useState("")
 
+  const [fullName, setFullName] = useState("")
+  const [gender, setGender] = useState("")
+  const [birthday, setBirthday] = useState("")
+  const [phoneNumber, setPhoneNumber] = useState("")
+  const [email, setEmail] = useState("")
+  const [address, setAddress] = useState("")
+
 
   // Helper function to safely parse JSON responses
   const safeParseJSON = async (response: Response) => {
@@ -542,18 +549,129 @@ export default function MemberPage() {
               <div>
                 <h1 className="text-2xl font-semibold mb-6">Thông tin tài khoản</h1>
                 <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <div className="mb-4">
+                <form
+                    onSubmit={async (e) => {
+                      e.preventDefault()
+                      // Collect form data
+                      const formData = {
+                        fullName: fullName,
+                        gender: Number.parseInt(gender),
+                        birthday: birthday,
+                        phoneNumber: phoneNumber,
+                        email: email,
+                        address: address,
+                      }
+
+                      // Here you would send the data to your API
+                      try {
+                        const response = await fetch('http://localhost:8080/api/au/user/update', {
+                          method: 'PUT',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            // 'Authorization': 'Bearer your-token-here'
+                            ...(token && { Authorization: `Bearer ${token}` })
+                          },
+                          body: JSON.stringify(formData),
+                        });
+                  
+                        if (!response.ok) {
+                          throw new Error('Network response was not ok');
+                        }
+                  
+                        const data = await response.json();
+                      console.log("Profile update submitted:", formData)
+                      alert("Thông tin tài khoản đã được cập nhật!")
+                    } catch (error) {
+                      console.error('Error:', error);
+                      // Handle error (e.g., show error message)
+                    }
+                    }}
+                    className="space-y-4"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Tên đăng nhập</label>
                     <p className="p-2 bg-gray-50 rounded">{username}</p>
                   </div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <p className="p-2 bg-gray-50 rounded">user@example.com</p>
+                  
+                  <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
+                        <input
+                          type="text"
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          className="w-full p-2 border rounded"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Giới tính</label>
+                        <select
+                          value={gender}
+                          onChange={(e) => setGender(e.target.value)}
+                          className="w-full p-2 border rounded"
+                          required
+                        >
+                          <option value="">Chọn giới tính</option>
+                          <option value="0">Nam</option>
+                          <option value="1">Nữ</option>
+                          <option value="2">Khác</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Ngày sinh</label>
+                        <input
+                          type="text"
+                          placeholder="DD/MM/YYYY"
+                          value={birthday}
+                          onChange={(e) => setBirthday(e.target.value)}
+                          className="w-full p-2 border rounded"
+                          required
+                        />
                   </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
-                    <p className="p-2 bg-gray-50 rounded">Chưa cập nhật</p>
+                    <input
+                          type="tel"
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                          className="w-full p-2 border rounded"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="w-full p-2 border rounded"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Địa chỉ</label>
+                      <textarea
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        className="w-full p-2 border rounded"
+                        rows={3}
+                        required
+                      ></textarea>
+                    </div>
+
+                    <div>
+                      <button type="submit" className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90">
+                        Cập nhật thông tin
+                      </button>
                   </div>
+                  </form>
                 </div>
               </div>
             )}
