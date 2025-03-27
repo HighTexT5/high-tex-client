@@ -7,24 +7,37 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { LogOut, User, Clock, Gift, ShoppingBag, Store } from "lucide-react"
 
+
+
 export default function MemberPage() {
   const router = useRouter()
   // Replace the formData state with individual state variables for each field
   const [username, setUsername] = useState<string | null>(null)
+  const [token, setToken] = useState<string>("")
   const [activeTab, setActiveTab] = useState("home")
   const [showDistributorForm, setShowDistributorForm] = useState(false)
+  const [showManagerNameInput, setShowManagerNameInput] = useState(false)
 
   // Individual form field states
-  const [userCode, setUserCode] = useState("")
+  const [managerName, setManagerName] = useState("")
   const [description, setDescription] = useState("")
-  const [region, setRegion] = useState("")
-  const [createdBy, setCreatedBy] = useState("")
-  const [createdDate, setCreatedDate] = useState(new Date().toISOString().split("T")[0])
   const [shopName, setShopName] = useState("")
   const [shopWarehouseAddress, setShopWarehouseAddress] = useState("")
   const [shopPhone, setShopPhone] = useState("")
   const [shopEmail, setShopEmail] = useState("")
   const [shopTaxCode, setShopTaxCode] = useState("")
+
+
+  // Helper function to safely parse JSON responses
+  const safeParseJSON = async (response: Response) => {
+    const text = await response.text()
+    try {
+      return JSON.parse(text)
+    } catch (e) {
+      console.error("Failed to parse response as JSON:", text.substring(0, 100) + "...")
+      throw new Error("Server returned an invalid response")
+    }
+  }
 
   // Sample order history data
   const orders = [
@@ -56,6 +69,7 @@ export default function MemberPage() {
     // Check if user is logged in
     const data = localStorage.getItem("data")
     const storedUsername = localStorage.getItem("username")
+    const storedToken = localStorage.getItem("token")
 
     if (!data || !storedUsername) {
       // Redirect to login if not logged in
@@ -64,15 +78,16 @@ export default function MemberPage() {
     }
 
     setUsername(storedUsername)
-    // Set the user code and created by fields to the username
-    setUserCode(storedUsername)
-    setCreatedBy(storedUsername)
+    // Set the user code to the username
+    setManagerName(storedUsername)
+    setToken(storedToken ?? "")
   }, [router])
 
   const handleLogout = () => {
     // Clear auth data
     localStorage.removeItem("data")
     localStorage.removeItem("username")
+    localStorage.removeItem("token")
 
     // Redirect to home page
     router.push("/")
@@ -84,20 +99,11 @@ export default function MemberPage() {
 
     // Update the appropriate state based on input name
     switch (name) {
-      case "userCode":
-        setUserCode(value)
+      case "managerName":
+        setManagerName(value)
         break
       case "description":
         setDescription(value)
-        break
-      case "region":
-        setRegion(value)
-        break
-      case "createdBy":
-        setCreatedBy(value)
-        break
-      case "createdDate":
-        setCreatedDate(value)
         break
       case "shopName":
         setShopName(value)
@@ -118,30 +124,52 @@ export default function MemberPage() {
   }
 
   // Update the handleSubmitForm function
-  const handleSubmitForm = (e: React.FormEvent) => {
+  const handleSubmitForm = async (e: React.FormEvent) => {
     e.preventDefault()
 
     // Collect all form data
     const formData = {
-      userCode,
-      description,
-      region,
-      createdBy,
-      createdDate,
       shopName,
       shopWarehouseAddress,
       shopPhone,
       shopEmail,
       shopTaxCode,
+      description,
     }
 
-    
+    try {
+      console.log("Attempting to send formData")
+
+      // Use relative URL with proxy configuration
+      const response = await fetch(" http://localhost:8080/api/request/user/create-be-a-distributor", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` })
+        },
+        body: JSON.stringify({
+          formData
+        }),
+      })
+
+      console.log("API response status:", response.status)
+
+      // Safely parse the JSON response
+      const data = await safeParseJSON(response)
+
+      if (!response.ok) {
+        console.warn("API returned error:", data)
+        throw new Error(data.message || "Gửi form yêu cầu thất bại")
+      }
 
     // Here you would normally send the data to your API
     console.log("Form submitted:", formData)
     alert("Yêu cầu của bạn đã được gửi thành công!")
     setShowDistributorForm(false)
     setActiveTab("home")
+    } catch (err) {
+      console.error("Distributor request error:", err)
+    }
   }
 
   return (
@@ -249,56 +277,28 @@ export default function MemberPage() {
                 {/* Update the form inputs to use individual state variables */}
                 {/* Replace the form inputs section with this: */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Mã người dùng</label>
-                    <input
-                      type="text"
-                      name="userCode"
-                      value={userCode}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border rounded"
-                      readOnly
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Khu vực</label>
-                    <select
-                      name="region"
-                      value={region}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border rounded"
-                      required
-                    >
-                      <option value="">Chọn khu vực</option>
-                      <option value="Miền Bắc">Miền Bắc</option>
-                      <option value="Miền Trung">Miền Trung</option>
-                      <option value="Miền Nam">Miền Nam</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Người tạo</label>
-                    <input
-                      type="text"
-                      name="createdBy"
-                      value={createdBy}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border rounded"
-                      readOnly
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Ngày tạo</label>
-                    <input
-                      type="date"
-                      name="createdDate"
-                      value={createdDate}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border rounded"
-                      readOnly
-                    />
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Tên quản lý</label>
+                    <div className="flex items-center">
+                      <input
+                        type="text"
+                        value={managerName || ""}
+                        className="w-full p-2 border rounded"
+                        readOnly={!showManagerNameInput}
+                      />
+                    </div>
+                    <div className="flex items-center mt-2">
+                      <input
+                        type="checkbox"
+                        id="enableManagerEdit"
+                        checked={showManagerNameInput}
+                        onChange={() => setShowManagerNameInput(!showManagerNameInput)}
+                        className="mr-2"
+                      />
+                      <label htmlFor="enableManagerEdit" className="text-xs text-gray-500">
+                        Chỉnh sửa tên quản lý
+                      </label>
+                    </div>
                   </div>
 
                   <div>
@@ -563,4 +563,3 @@ export default function MemberPage() {
     </div>
   )
 }
-

@@ -71,7 +71,8 @@ export default function LoginPage() {
         localStorage.setItem("data", d.data)
         console.log('token, user and role retrived')
         // Store username for display in header
-        localStorage.setItem("username", d.data.username) 
+        localStorage.setItem("username", d.data.username)
+        localStorage.setItem("token", d.data.token) 
         console.log(username)
       } else {
         //for logging-only purpose
