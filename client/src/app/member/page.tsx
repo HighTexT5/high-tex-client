@@ -34,6 +34,10 @@ export default function MemberPage() {
   const [email, setEmail] = useState("")
   const [address, setAddress] = useState("")
 
+  // Add these state variables at the top with the other state declarations
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
 
   // Helper function to safely parse JSON responses
   const safeParseJSON = async (response: Response) => {
@@ -89,6 +93,60 @@ export default function MemberPage() {
     setManagerName(storedUsername)
     setToken(storedToken ?? "")
   }, [router])
+
+  // Add this useEffect after the existing useEffect
+  useEffect(() => {
+    // Only fetch user data when the account tab is active
+    if (activeTab === "account") {
+      fetchUserData()
+    }
+  }, [activeTab])
+
+  // Add this function to fetch user data
+  const fetchUserData = async () => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      // Replace with your actual API endpoint
+      const response = await fetch("http://localhost:8080/api/au/user/data", {
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user data")
+      }
+
+      const userData = await response.json()
+      console.log("Fetched user data:", userData) // Debug log to see what data is returned
+
+      // Update form fields with fetched data if available
+      if (userData) {
+        setFullName(userData.data.fullName || "")
+        setGender(userData.data.gender?.toString() || "")
+        setBirthday(userData.data.birthday || "")
+        setPhoneNumber(userData.data.phoneNumber || "")
+        setEmail(userData.data.email || "")
+        setAddress(userData.data.address || "")
+
+        console.log("Form fields updated with:", {
+          fullName: userData.fullName,
+          gender: userData.gender,
+          birthday: userData.birthday,
+          phoneNumber: userData.phoneNumber,
+          email: userData.email,
+          address: userData.address,
+        }) // Debug log to confirm state updates
+      }
+    } catch (err) {
+      console.error("Error fetching user data:", err)
+      setError("Không thể tải thông tin người dùng. Vui lòng thử lại sau.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleLogout = () => {
     // Clear auth data
@@ -549,6 +607,13 @@ export default function MemberPage() {
               <div>
                 <h1 className="text-2xl font-semibold mb-6">Thông tin tài khoản</h1>
                 <div className="bg-white p-6 rounded-lg shadow-sm">
+                {error && <div className="bg-red-100 text-red-600 p-3 rounded-md text-sm mb-4">{error}</div>}
+
+                {isLoading ? (
+                  <div className="flex justify-center items-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  </div>
+                ) : (
                 <form
                     onSubmit={async (e) => {
                       e.preventDefault()
@@ -672,6 +737,7 @@ export default function MemberPage() {
                       </button>
                   </div>
                   </form>
+                )}
                 </div>
               </div>
             )}
