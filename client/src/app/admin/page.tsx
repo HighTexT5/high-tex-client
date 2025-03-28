@@ -85,7 +85,7 @@ export default function AdminPage() {
           <Category
             title="Quản lý sản phẩm"
             items={[
-              { name: "Kiểm duyệt sản phẩm", path: "/admin/review-products" },
+              { name: "Kiểm duyệt sản phẩm", path: "/admin/product_verification" },
               { name: "Gỡ bỏ sản phẩm", path: "/admin/remove-products" },
             ]}
             isOpen={openCategories.products}

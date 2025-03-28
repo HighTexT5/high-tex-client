@@ -112,7 +112,7 @@ export default function Header() {
 
         <Button
           variant="outline"
-          className="mr-2 bg-white border-gray-300 text-black text-sm h-9"
+          className="mr-2 bg-white border-gray-300 text-black text-sm h-9 cursor-pointer"
           onClick={handleSellerClick}
         >
           Kênh người bán
@@ -124,29 +124,40 @@ export default function Header() {
         <div className="absolute right-0 top-0 h-full flex items-center pr-3">
           <span className="text-gray-400 cursor-pointer">×</span>
         </div>
-        <Button className="absolute right-0 top-0 h-full bg-white border-l border-gray-300" variant="ghost">
+        <Button
+          className="absolute right-0 top-0 h-full bg-white border-l border-gray-300 cursor-pointer"
+          variant="ghost"
+        >
           <Search className="h-5 w-5 text-gray-500" />
         </Button>
       </div>
 
       <div className="flex items-center">
-        <Button variant="outline" className="mr-2 bg-accent text-black border-accent h-9">
+        <Button variant="outline" className="mr-2 bg-accent text-black border-accent h-9 cursor-pointer">
           Tra cứu đơn hàng
         </Button>
         <Button
           variant="outline"
-          className="mr-2 bg-accent text-black border-accent h-9 w-9 p-0"
+          className="mr-2 bg-accent text-black border-accent h-9 w-9 p-0 cursor-pointer"
           onClick={handleCartClick}
         >
           <ShoppingCart className="h-5 w-5" />
         </Button>
 
         {username ? (
-          <Button variant="outline" className="bg-accent text-black border-accent h-9" onClick={handleMemberClick}>
+          <Button
+            variant="outline"
+            className="bg-accent text-black border-accent h-9 cursor-pointer"
+            onClick={handleMemberClick}
+          >
             {username}
           </Button>
         ) : (
-          <Button variant="outline" className="bg-accent text-black border-accent h-9" onClick={handleLoginClick}>
+          <Button
+            variant="outline"
+            className="bg-accent text-black border-accent h-9 cursor-pointer"
+            onClick={handleLoginClick}
+          >
             Đăng nhập
           </Button>
         )}
