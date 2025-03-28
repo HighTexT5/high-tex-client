@@ -268,8 +268,8 @@ const navCategories = [
 export default function Navbar() {
   const pathname = usePathname()
 
-  // Don't render navbar on seller page
-  if (pathname.startsWith("/seller")) {
+  // Don't render navbar on seller or admin pages
+  if (pathname.startsWith("/seller") || pathname.startsWith("/admin")) {
     return null
   }
 

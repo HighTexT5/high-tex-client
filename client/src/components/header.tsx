@@ -15,17 +15,17 @@ export default function Header() {
   const [shouldRender, setShouldRender] = useState(true)
 
   useEffect(() => {
-    if (pathname.startsWith("/seller")) {
+    if (pathname.startsWith("/seller") || pathname.startsWith("/admin")) {
       setShouldRender(false)
       return
     }
     setShouldRender(true)
 
     // Check if user is logged in on component mount and on every render
-    const data = localStorage.getItem("data")
+    const token = localStorage.getItem("token")
     const storedUsername = localStorage.getItem("username")
 
-    if (data && storedUsername) {
+    if (token && storedUsername) {
       setUsername(storedUsername)
     } else {
       setUsername(null)
@@ -36,10 +36,10 @@ export default function Header() {
   useEffect(() => {
     // Function to handle storage changes
     const handleStorageChange = () => {
-      const data = localStorage.getItem("data")
+      const token = localStorage.getItem("token")
       const storedUsername = localStorage.getItem("username")
 
-      if (data && storedUsername) {
+      if (token && storedUsername) {
         setUsername(storedUsername)
       } else {
         setUsername(null)
@@ -68,7 +68,7 @@ export default function Header() {
 
   const handleLogout = () => {
     // Clear auth data
-    localStorage.removeItem("data")
+    localStorage.removeItem("token")
     localStorage.removeItem("username")
     setUsername(null)
 
@@ -86,10 +86,10 @@ export default function Header() {
 
   // Add this function after the other handler functions
   const checkLoginStatus = () => {
-    const data = localStorage.getItem("data")
+    const token = localStorage.getItem("token")
     const storedUsername = localStorage.getItem("username")
 
-    if (data && storedUsername) {
+    if (token && storedUsername) {
       setUsername(storedUsername)
     } else {
       setUsername(null)
