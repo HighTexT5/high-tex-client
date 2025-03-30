@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import ProductCard from "@/components/product-card"
-import PhoneCard from "@/components/phone-card"
 import PaymentMethods from "@/components/payment-methods"
+import PhoneProductsSection from "@/components/phone-products-section"
 
 export default function Home() {
   const laptopProducts = Array(5).fill({
@@ -50,19 +50,7 @@ export default function Home() {
       {/* Phone Products */}
       <section className="bg-phone-bg p-4 my-4 mx-4 rounded-lg">
         <h2 className="text-lg font-semibold mb-4">Phone</h2>
-        <div className="relative">
-          <div className="flex overflow-x-auto space-x-4 pb-4">
-            {phoneProducts.map((product, index) => (
-              <PhoneCard key={index} product={product} />
-            ))}
-          </div>
-          <button className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md">
-            <ChevronLeft className="h-6 w-6" />
-          </button>
-          <button className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md">
-            <ChevronRight className="h-6 w-6" />
-          </button>
-        </div>
+        <PhoneProductsSection />
       </section>
 
       {/* Laptop Products */}
