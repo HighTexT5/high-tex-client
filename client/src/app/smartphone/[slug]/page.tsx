@@ -53,88 +53,95 @@ export default function ProductDetailPage() {
   const params = useParams()
   const searchParams = useSearchParams()
   const productId = searchParams.get("id")
+
   const [product, setProduct] = useState<ProductData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeImage, setActiveImage] = useState<string | null>(null)
+  const [debugInfo, setDebugInfo] = useState<string>("")
+
+  // Add debug info to the state so we can display it on the page
+  const addDebugInfo = (message: string) => {
+    console.log(message)
+    setDebugInfo((prev) => prev + "\n" + message)
+  }
+
+  // Run this immediately when component mounts
+  useEffect(() => {
+    addDebugInfo(`Component mounted with slug: ${params.slug}, productId: ${productId || "none"}`)
+  }, [])
 
   useEffect(() => {
     const fetchProductDetail = async () => {
       setIsLoading(true)
       setError(null)
 
+      // Check if we have a product ID
+      if (!productId) {
+        const errorMsg = "No product ID provided in URL"
+        addDebugInfo(errorMsg)
+        setError(errorMsg)
+
+        // Use fallback data
+        const fallbackProduct = createFallbackProduct()
+        setProduct(fallbackProduct)
+        setActiveImage(fallbackProduct.thumbnailUrl)
+        setIsLoading(false)
+        return
+      }
+
       try {
+        addDebugInfo(`Attempting to fetch product with ID: ${productId}`)
+
         // Replace with your actual API endpoint
-        const response = await fetch(`http://localhost:8080/api/products/${productId}`)
+        const apiUrl = `http://localhost:8080/api/item/detail?id=${productId}`
+        addDebugInfo(`API URL: ${apiUrl}`)
+
+        const response = await fetch(apiUrl)
+        addDebugInfo(`API response status: ${response.status}`)
 
         if (!response.ok) {
           throw new Error(`API request failed with status ${response.status}`)
         }
 
-        const data: ApiResponse = await response.json()
+        const data = await response.json()
+        addDebugInfo(`API response data received: ${JSON.stringify(data).substring(0, 100)}...`)
 
         if (data.status === 200 && data.message === "Success") {
           setProduct(data.data)
           setActiveImage(data.data.thumbnailUrl)
+          addDebugInfo("Successfully set product data from API")
         } else {
           throw new Error(`API returned error: ${data.message}`)
         }
       } catch (err) {
-        console.error("Error fetching product details:", err)
-        setError(err instanceof Error ? err.message : "Failed to fetch product details")
+        const errorMsg = err instanceof Error ? err.message : "Failed to fetch product details"
+        addDebugInfo(`Error: ${errorMsg}`)
+        setError(errorMsg)
 
         // Use fallback data if API fails
-        setProduct({
-          id: 2,
-          itemCode: "SM28841743270276718",
-          itemName: params.slug ? String(params.slug).replace(/-/g, " ") : "Smartphone XYZ2",
-          shopCode: "SHOP1742835163046",
-          shopName: "Shop Acc2",
-          category: "smartphone",
-          brand: "BrandName",
-          productSource: "Manufacturer",
-          quantity: 97,
-          originPrice: 999999.0,
-          currentPrice: 999999.0,
-          rating: 0.0,
-          fileUrls: [
-            "/placeholder.svg?height=500&width=500",
-            "/placeholder.svg?height=500&width=500",
-            "/placeholder.svg?height=500&width=500",
-          ],
-          thumbnailUrl: "/placeholder.svg?height=500&width=500",
-          detail: {
-            screenSize: 6.5,
-            screenResolution: "1080x2400",
-            os: "Android 11",
-            screenTechnology: "AMOLED",
-            backCamera: "108MP",
-            frontCamera: "32MP",
-            nfc: true,
-            sim: "Dual SIM",
-            screenFeature: "HDR10+",
-            compatible: "5G",
-            chipset: "Snapdragon 888",
-            cpu: "Octa-core",
-            memory: "256GB",
-            ram: "12GB",
-            battery: "4500mAh",
-          },
-        })
-        setActiveImage("/placeholder.svg?height=500&width=500")
+        const fallbackProduct = createFallbackProduct()
+        setProduct(fallbackProduct)
+        setActiveImage(fallbackProduct.thumbnailUrl)
       } finally {
         setIsLoading(false)
       }
     }
 
-    if (productId) {
-      fetchProductDetail()
-    } else {
-      // If no product ID is provided, use fallback data
-      setProduct({
-        id: 2,
+    // Create fallback product data
+    const createFallbackProduct = () => {
+      const productName = params.slug
+        ? String(params.slug)
+            .replace(/-/g, " ")
+            .replace(/\b\w/g, (c) => c.toUpperCase())
+        : "Smartphone XYZ2"
+
+      addDebugInfo(`Created fallback product with name: ${productName}`)
+
+      return {
+        id: Number.parseInt(productId as string) || 2,
         itemCode: "SM28841743270276718",
-        itemName: params.slug ? String(params.slug).replace(/-/g, " ") : "Smartphone XYZ2",
+        itemName: productName,
         shopCode: "SHOP1742835163046",
         shopName: "Shop Acc2",
         category: "smartphone",
@@ -167,10 +174,11 @@ export default function ProductDetailPage() {
           ram: "12GB",
           battery: "4500mAh",
         },
-      })
-      setActiveImage("/placeholder.svg?height=500&width=500")
-      setIsLoading(false)
+      }
     }
+
+    // Start the fetch process
+    fetchProductDetail()
   }, [productId, params.slug])
 
   // Format price to Vietnamese currency format
@@ -180,9 +188,9 @@ export default function ProductDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-blue-50 flex justify-center items-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        <span className="ml-3 text-lg">Đang tải thông tin sản phẩm...</span>
+      <div className="min-h-screen bg-blue-50 flex flex-col justify-center items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+        <span className="text-lg">Đang tải thông tin sản phẩm...</span>
       </div>
     )
   }
@@ -199,10 +207,21 @@ export default function ProductDetailPage() {
         </div>
       </div>
 
+      {/* Debug information - only visible during development */}
+      {process.env.NODE_ENV === "development" && debugInfo && (
+        <div className="container mx-auto px-4 mb-4">
+          <details className="bg-gray-100 p-3 rounded-md text-xs">
+            <summary className="font-medium cursor-pointer">Debug Information</summary>
+            <pre className="mt-2 whitespace-pre-wrap">{debugInfo}</pre>
+          </details>
+        </div>
+      )}
+
       {error && (
         <div className="container mx-auto px-4 mb-4">
           <div className="bg-red-50 text-red-500 p-3 rounded-md text-sm">
-            <p>Lỗi kết nối API: Đang hiển thị dữ liệu mẫu</p>
+            <p>Lỗi: {error}</p>
+            <p>Đang hiển thị dữ liệu mẫu</p>
           </div>
         </div>
       )}

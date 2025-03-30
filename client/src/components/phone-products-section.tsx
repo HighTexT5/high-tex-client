@@ -32,9 +32,9 @@ export default function PhoneProductsSection() {
       try {
         // Replace with your actual API endpoint
         const response = await fetch("http://localhost:8080/api/item/all", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+          // headers: {
+          //   Authorization: `Bearer ${localStorage.getItem("token")}`,
+          // },
         })
         
 
@@ -128,6 +128,7 @@ export default function PhoneProductsSection() {
               <PhoneCard
                 key={product.id}
                 product={{
+                  id: product.id, // Make sure to pass the ID
                   name: product.name,
                   price: formatPrice(product.price),
                   rating: product.rating.toString(),
