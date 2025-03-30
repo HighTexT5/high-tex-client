@@ -59,6 +59,9 @@ export default function ProductDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [activeImage, setActiveImage] = useState<string | null>(null)
   const [debugInfo, setDebugInfo] = useState<string>("")
+  const [isAddingToCart, setIsAddingToCart] = useState(false)
+  const [addToCartSuccess, setAddToCartSuccess] = useState(false)
+  const [addToCartError, setAddToCartError] = useState<string | null>(null)
 
   // Add debug info to the state so we can display it on the page
   const addDebugInfo = (message: string) => {
@@ -180,6 +183,89 @@ export default function ProductDetailPage() {
     // Start the fetch process
     fetchProductDetail()
   }, [productId, params.slug])
+
+  const handleAddToCart = async () => {
+    if (!product) return
+
+    setIsAddingToCart(true)
+    setAddToCartSuccess(false)
+    setAddToCartError(null)
+
+    try {
+      // Replace with your actual API endpoint
+      const response = await fetch(`http://localhost:8080/api/shopping-cart/add?itemCode=${encodeURIComponent(product.itemCode)}&quantity=${1}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`)
+      }
+
+      const data = await response.json()
+
+      if (data.status === 200 && data.message === "Success") {
+        setAddToCartSuccess(true)
+
+        // Update cart count in localStorage if needed
+        const cartDataString = localStorage.getItem("cartData")
+        if (cartDataString) {
+          try {
+            const cartData = JSON.parse(cartDataString)
+
+            // Check if item already exists in cart
+            const existingItemIndex = cartData.items.findIndex((item: any) => item.itemCode === product.itemCode)
+
+            if (existingItemIndex >= 0) {
+              // Update quantity if item exists
+              cartData.items[existingItemIndex].quantity += 1
+            } else {
+              // Add new item if it doesn't exist
+              cartData.items.push({
+                itemName: product.itemName,
+                quantity: 1,
+                currentPrice: product.currentPrice,
+                thumbnailUrl: product.thumbnailUrl,
+              })
+            }
+
+            // Update total price
+            cartData.totalPrice = cartData.items.reduce(
+              (total: number, item: any) => total + item.currentPrice * item.quantity,
+              0,
+            )
+
+            localStorage.setItem("cartData", JSON.stringify(cartData))
+
+            // Trigger storage event to update cart count in header
+            window.dispatchEvent(new Event("storage"))
+          } catch (err) {
+            console.error("Error updating cart data in localStorage:", err)
+          }
+        }
+
+        // Hide success message after 3 seconds
+        setTimeout(() => {
+          setAddToCartSuccess(false)
+        }, 3000)
+      } else {
+        throw new Error(data.message || "Failed to add item to cart")
+      }
+    } catch (err) {
+      console.error("Error adding to cart:", err)
+      setAddToCartError(err instanceof Error ? err.message : "Failed to add item to cart")
+
+      // Hide error message after 3 seconds
+      setTimeout(() => {
+        setAddToCartError(null)
+      }, 3000)
+    } finally {
+      setIsAddingToCart(false)
+    }
+  }
 
   // Format price to Vietnamese currency format
   const formatPrice = (price: number) => {
@@ -319,10 +405,58 @@ export default function ProductDetailPage() {
 
                 <div className="space-y-4">
                   <Button className="w-full bg-primary text-white hover:bg-primary/90 h-12">Mua ngay</Button>
-                  <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/10 h-12">
-                    <ShoppingCart className="mr-2 h-5 w-5" />
-                    Thêm vào giỏ hàng
+                  <Button
+                    variant="outline"
+                    className="w-full border-primary text-primary hover:bg-primary/10 h-12"
+                    onClick={handleAddToCart}
+                    disabled={isAddingToCart}
+                  >
+                    {isAddingToCart ? (
+                      <>
+                        <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                        Đang thêm...
+                      </>
+                    ) : (
+                      <>
+                      <ShoppingCart className="mr-2 h-5 w-5" />
+                      Thêm vào giỏ hàng
+                      </>
+                    )}
                   </Button>
+                  {addToCartSuccess && (
+                    <div className="mt-2 p-2 bg-green-50 text-green-600 rounded-md text-sm flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 mr-1"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Đã thêm sản phẩm vào giỏ hàng
+                    </div>
+                  )}
+
+                  {addToCartError && (
+                    <div className="mt-2 p-2 bg-red-50 text-red-600 rounded-md text-sm flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 mr-1"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      {addToCartError}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

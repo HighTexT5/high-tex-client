@@ -136,9 +136,9 @@ export default function ProductVerificationPage() {
     try {
       // Replace with your actual API endpoint
       const response = await fetch("http://localhost:8080/api/request/admin/get-list-active-item", {
-        // headers: {
-        //   Authorization: `Bearer ${localStorage.getItem("token")}`,
-        // },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       })
 
       if (!response.ok) {
