@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button"
 
 interface CartItem {
   itemName: string
+  itemCode: string
   quantity: number
   currentPrice: number
   thumbnailUrl: string
-  id?: string // For compatibility with existing code
 }
 
 interface CartData {
@@ -74,12 +74,14 @@ export default function CartPage() {
           items: [
             {
               itemName: "Smartphone XYZ",
+              itemCode: "123123131231",
               quantity: 4,
               currentPrice: 999.99,
               thumbnailUrl: "https://i.ibb.co/tpQcK667/5e71f2a46ad2.png",
             },
             {
               itemName: "Smartphone XYZ2",
+              itemCode: "s9d0afugj20jeqj",
               quantity: 3,
               currentPrice: 999999.0,
               thumbnailUrl: "https://i.ibb.co/G3tnXrwq/0616f75332c6.png",
@@ -153,16 +155,12 @@ export default function CartPage() {
       // Replace with your actual API endpoint
       const itemToUpdate = cartItems[index]
 
-      const response = await fetch(`http://localhost:8080/api/shopping-cart/add?itemCode=${itemCode}&quantity=${newQuantity}`, {
+      const response = await fetch(`http://localhost:8080/api/shopping-cart/add?itemCode=${itemToUpdate.itemCode}&quantity=${newQuantity}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify({
-          itemName: itemToUpdate.itemName,
-          quantity: newQuantity,
-        }),
       })
 
       if (!response.ok) {
