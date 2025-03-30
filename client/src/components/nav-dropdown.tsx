@@ -21,7 +21,7 @@ export default function NavDropdown({ items, className }: NavDropdownProps) {
                 key={itemIndex}
                 href={item.href}
                 className={cn(
-                  "block text-sm hover:text-primary transition-colors",
+                  "block text-sm text-black hover:text-primary transition-colors",
                   item.featured && "font-semibold text-primary",
                 )}
               >
