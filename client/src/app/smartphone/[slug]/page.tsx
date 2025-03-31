@@ -193,12 +193,16 @@ export default function ProductDetailPage() {
 
     try {
       // Replace with your actual API endpoint
-      const response = await fetch(`http://localhost:8080/api/shopping-cart/add?itemCode=${encodeURIComponent(product.itemCode)}&quantity=${1}`, {
+      const response = await fetch("http://localhost:8080/api/shopping-cart/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
+        body: JSON.stringify({
+          itemCode: product.itemCode,
+          quantity: 1,
+        }),
       })
 
       if (!response.ok) {

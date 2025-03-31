@@ -5,6 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { ArrowLeft, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
 
 interface CartItem {
   itemName: string
@@ -24,6 +25,7 @@ export default function CartPage() {
   const [totalPrice, setTotalPrice] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
     // Fetch cart data from localStorage or API
@@ -155,12 +157,16 @@ export default function CartPage() {
       // Replace with your actual API endpoint
       const itemToUpdate = cartItems[index]
 
-      const response = await fetch(`http://localhost:8080/api/shopping-cart/add?itemCode=${itemToUpdate.itemCode}&quantity=${newQuantity}`, {
+      const response = await fetch("http://localhost:8080/api/shopping-cart/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
+        body: JSON.stringify({
+          itemCode: itemToUpdate.itemCode,
+          quantity: newQuantity,
+        }),
       })
 
       if (!response.ok) {
@@ -298,7 +304,9 @@ export default function CartPage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white shadow-md py-4 border-t">
           <div className="container mx-auto flex justify-between items-center">
             <div className="font-semibold">Tổng giá trị: {formatPrice(totalPrice)}</div>
-            <Button className="bg-accent text-black border-accent">Mua ngay</Button>
+            <Button className="bg-accent text-black border-accent" onClick={() => router.push("/cart/payment-info")}>
+              Mua ngay
+            </Button>
           </div>
         </div>
       )}

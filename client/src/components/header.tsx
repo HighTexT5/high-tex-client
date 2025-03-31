@@ -69,9 +69,9 @@ export default function Header() {
     }
   }, [])
 
-  useEffect(() => {
-    fetchCartData()
-  }, [])
+  // useEffect(() => {
+  //   fetchCartData()
+  // }, [])
 
   const handleCartClick = async () => {
     setIsCartLoading(true)

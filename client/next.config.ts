@@ -8,6 +8,7 @@ export default nextConfig;
 
 module.exports = {
   images: {
-    domains: ['i.ibb.co'], // Add your image hostname here
+    domains: ['i.ibb.co',
+      'res.cloudinary.com'], // Add your image hostname here
   },
 }
