@@ -38,6 +38,15 @@ interface SellerDetails {
   modifiedDate?: string
 }
 
+interface DataItem {
+  requestId?: string;
+  _id?: string;
+  fullName?: string;
+  username?: string;
+  shopName?: string;
+  id?: string;
+}
+
 function Category({ title, items, isOpen, onToggle }: CategoryProps) {
   return (
     <div className="mb-4">
@@ -139,7 +148,7 @@ export default function SellerVerificationPage() {
       // If data is available and is an array, update the state
       if (data && Array.isArray(data.data)) {
         // Map the API response to match our expected format
-        const formattedData = data.data.map((item) => ({
+        const formattedData = data.data.map((item: DataItem) => ({
           id: item.requestId || item._id || String(Math.random()),
           username: item.fullName || item.username || "Unknown",
           storeName: item.shopName || "Unknown",

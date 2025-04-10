@@ -274,13 +274,13 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="bg-primary text-white relative z-10 w-full">
+    <nav className="bg-secondary text-black relative z-10 w-full">
       <div className="flex w-full">
         {navCategories.map((category, index) => (
           <div key={index} className="group static">
             <Link
               href={category.href}
-              className="block px-4 py-3 hover:bg-primary-foreground hover:text-primary transition-colors"
+              className="block px-4 py-3 hover:text-[#2962FF] hover:underline transition-colors"
             >
               {category.name}
             </Link>

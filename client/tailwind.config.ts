@@ -20,8 +20,8 @@ const config = {
     },
     extend: {
       colors: {
-        primary: "#f3763c",
-        secondary: "#d9d9d9",
+        primary: "#0A2463",
+        secondary: "#bcd5fa",
         accent: "#ff8000",
         "accent-yellow": "#faff5a",
         "accent-blue": "#6598ef",

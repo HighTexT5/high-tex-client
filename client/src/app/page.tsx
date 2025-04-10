@@ -25,9 +25,9 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       {/* Advertisement */}
-      <section className="bg-secondary py-10 px-4 my-4 mx-4 rounded-lg">
+      {/* <section className="bg-secondary py-10 px-4 my-4 mx-4 rounded-lg">
         <div className="text-center text-gray-600">Quảng cáo</div>
-      </section>
+      </section> */}
 
       {/* Discount Products */}
       <section className="bg-secondary p-4 my-4 mx-4 rounded-lg">
