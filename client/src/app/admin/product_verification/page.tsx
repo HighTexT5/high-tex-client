@@ -24,6 +24,13 @@ interface ProductRequest {
   productName: string
 }
 
+interface ApiResponseItem {
+  requestId?: string;
+  shopName?: string;
+  productType?: string;
+  itemName?: string;
+}
+
 interface ProductDetails {
   id: string
   storeName: string
@@ -36,7 +43,13 @@ interface ProductDetails {
   images: string[]
   createdDate: string
   modifiedDate?: string
+  proof?: string
+  brand?: string
+  productSource?: string
+  status?: string
 }
+
+
 
 function Category({ title, items, isOpen, onToggle }: CategoryProps) {
   return (
@@ -148,14 +161,14 @@ export default function ProductVerificationPage() {
       const data = await response.json()
       console.log("Fetched product requests:", data) // Debug log
 
-      // If data is available and is an array, update the state
-      if (data && Array.isArray(data)) {
+      // If data.data is available and is an array, update the state
+      if (data && Array.isArray(data.data)) {
         // Map the API response to match our expected format
-        const formattedData = data.map((item) => ({
-          id: item.id || item._id || String(Math.random()),
-          storeName: item.storeName || "Unknown Store",
+        const formattedData = data.data.map((item: ApiResponseItem) => ({
+          id: item.requestId || String(Math.random()),
+          storeName: item.shopName || "Unknown Store",
           productType: item.productType || "Unknown Type",
-          productName: item.productName || "Unknown Product",
+          productName: item.itemName || "Unknown Product",
         }))
 
         // Keep the example if the array is empty
@@ -179,12 +192,15 @@ export default function ProductVerificationPage() {
     setDetailsError(null)
 
     try {
-      // Replace with your actual API endpoint
-      const response = await fetch(`http://localhost:8080/api/admin/product-details/${productId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+      // Use the new API endpoint
+      const response = await fetch(
+        `http://localhost:8080/api/request/all/get-detail-active-item?requestId=${productId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         },
-      })
+      )
 
       if (!response.ok) {
         throw new Error("Failed to fetch product details")
@@ -193,46 +209,27 @@ export default function ProductVerificationPage() {
       const data = await response.json()
       console.log("Fetched product details:", data) // Debug log
 
-      // If no data is returned, use example data
-      if (!data) {
-        // Use example data based on the product ID
-        const exampleProduct = productRequests.find((p) => p.id === productId)
-
+      if (data.status === 200 && data.message === "Success") {
+        // Map the API response to match our expected format
+        const productDetail = data.data
         setProductDetails({
           id: productId,
-          storeName: exampleProduct?.storeName || "Unknown Store",
-          productType: exampleProduct?.productType || "Unknown Type",
-          productName: exampleProduct?.productName || "Unknown Product",
-          description: "Sản phẩm chính hãng, bảo hành 12 tháng toàn quốc. Thiết kế sang trọng, hiệu năng mạnh mẽ.",
-          price: "29.990.000 đ",
-          stock: 50,
-          specifications: {
-            "Màn hình": "6.7 inch, OLED, Super Retina XDR",
-            CPU: "Apple A17 Pro",
-            RAM: "8GB",
-            "Bộ nhớ trong": "256GB",
-            "Camera sau": "48MP + 12MP + 12MP",
-            "Camera trước": "12MP",
-            Pin: "4422 mAh",
-          },
+          storeName: productDetail.managerName || "Unknown Store",
+          productType: productDetail.category || "Unknown Type",
+          productName: productDetail.itemName || "Unknown Product",
+          description: productDetail.description || "No description",
+          price: productDetail.price ? `${productDetail.price.toLocaleString("vi-VN")} đ` : "0 đ",
+          stock: productDetail.quantity || 0,
+          specifications: productDetail.detail || {},
           images: ["/placeholder.svg?height=200&width=200", "/placeholder.svg?height=200&width=200"],
           createdDate: new Date().toLocaleDateString("vi-VN"),
+          proof: productDetail.proof || "",
+          brand: productDetail.brand || "",
+          productSource: productDetail.productSource || "",
+          status: productDetail.status || "Pending",
         })
       } else {
-        // Map the API response to match our expected format
-        setProductDetails({
-          id: productId,
-          storeName: data.storeName || "Unknown Store",
-          productType: data.productType || "Unknown Type",
-          productName: data.productName || "Unknown Product",
-          description: data.description || "No description",
-          price: data.price || "0 đ",
-          stock: data.stock || 0,
-          specifications: data.specifications || {},
-          images: data.images || [],
-          createdDate: data.createdDate ? new Date(data.createdDate).toLocaleDateString("vi-VN") : "Unknown",
-          modifiedDate: data.modifiedDate ? new Date(data.modifiedDate).toLocaleDateString("vi-VN") : undefined,
-        })
+          throw new Error(`API returned error: ${data.message}`)
       }
     } catch (err) {
       console.error("Error fetching product details:", err)
@@ -243,23 +240,35 @@ export default function ProductVerificationPage() {
 
       setProductDetails({
         id: productId,
-        storeName: exampleProduct?.storeName || "Unknown Store",
-        productType: exampleProduct?.productType || "Unknown Type",
-        productName: exampleProduct?.productName || "Unknown Product",
-        description: "Sản phẩm chính hãng, bảo hành 12 tháng toàn quốc. Thiết kế sang trọng, hiệu năng mạnh mẽ.",
-        price: "29.990.000 đ",
-        stock: 50,
+        storeName: "Nguyen Van An",
+        productType: "smartphone",
+        productName: "Smartphone Super Vippro",
+        description: "A high-end smartphone with advanced features.",
+        price: "1.999 đ",
+        stock: 1500,
         specifications: {
-          "Màn hình": "6.7 inch, OLED, Super Retina XDR",
-          CPU: "Apple A17 Pro",
-          RAM: "8GB",
-          "Bộ nhớ trong": "256GB",
-          "Camera sau": "48MP + 12MP + 12MP",
-          "Camera trước": "12MP",
-          Pin: "4422 mAh",
+          screenSize: 7.5,
+          screenResolution: "1080x2400",
+          os: "Android 11",
+          screenTechnology: "AMOLED",
+          backCamera: "108MP",
+          frontCamera: "32MP",
+          nfc: true,
+          sim: "Dual SIM",
+          screenFeature: "HDR10+",
+          compatible: "5G",
+          chipset: "Snapdragon 888",
+          cpu: "Octa-core",
+          memory: "256GB",
+          ram: "12GB",
+          battery: "5000mAh",
         },
         images: ["/placeholder.svg?height=200&width=200", "/placeholder.svg?height=200&width=200"],
         createdDate: new Date().toLocaleDateString("vi-VN"),
+        proof: "AAA.pdf",
+        brand: "BrandName",
+        productSource: "Manufacturer",
+        status: "Pending",
       })
     } finally {
       setIsLoadingDetails(false)
@@ -293,15 +302,15 @@ export default function ProductVerificationPage() {
     setSubmitSuccess(null)
 
     try {
-      // Replace with your actual API endpoint
-      const response = await fetch("http://localhost:8080/api/admin/product-decision", {
+      // Use the new API endpoint
+      const response = await fetch("http://localhost:8080/api/request/admin/opinion-from-manager-on-item", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
-          requestId: selectedProductId,
+          requestId: Number(selectedProductId),
           opinion: opinion,
           detail: reasonText,
         }),
@@ -564,6 +573,30 @@ export default function ProductVerificationPage() {
                     <p className="text-gray-700 p-3 bg-gray-50 rounded">{productDetails.description}</p>
                   </div>
 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                    <div>
+                      <h4 className="text-lg font-medium mb-2">Thông tin cơ bản</h4>
+                      <div className="space-y-2">
+                        <div className="grid grid-cols-3 border-b pb-2">
+                          <span className="font-medium text-gray-600">Thương hiệu:</span>
+                          <span className="col-span-2">{productDetails.brand}</span>
+                        </div>
+                        <div className="grid grid-cols-3 border-b pb-2">
+                          <span className="font-medium text-gray-600">Nguồn sản phẩm:</span>
+                          <span className="col-span-2">{productDetails.productSource}</span>
+                        </div>
+                        <div className="grid grid-cols-3 border-b pb-2">
+                          <span className="font-medium text-gray-600">Tài liệu chứng minh:</span>
+                          <span className="col-span-2">{productDetails.proof}</span>
+                        </div>
+                        <div className="grid grid-cols-3 border-b pb-2">
+                          <span className="font-medium text-gray-600">Trạng thái:</span>
+                          <span className="col-span-2">{productDetails.status}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   <div>
                     <h4 className="text-lg font-medium mb-2">Thông số kỹ thuật</h4>
                     <div className="bg-gray-50 rounded p-3">
@@ -607,7 +640,7 @@ export default function ProductVerificationPage() {
                       onClick={() => setShowApproveDialog(true)}
                       disabled={isSubmitting || !!submitSuccess}
                     >
-                      Phê duyệt
+                      Đồng ý
                     </Button>
                   </div>
 
