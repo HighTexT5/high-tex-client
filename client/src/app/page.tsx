@@ -30,44 +30,74 @@ export default function Home() {
       </section> */}
 
       {/* Discount Products */}
-      <section className="bg-secondary p-4 my-4 mx-4 rounded-lg">
+      <section className="bg-secondary p-4 my-4 mx-auto max-w-5xl rounded-lg">
         <h2 className="text-lg font-semibold mb-4">Discount</h2>
         <div className="relative">
-          <div className="flex overflow-x-auto space-x-4 pb-4">
+          <div className="flex overflow-x-auto space-x-4 pb-4 snap-x snap-mandatory scrollbar-hide">
             {laptopProducts.map((product, index) => (
-              <ProductCard key={index} product={product} />
+              <div
+                key={index}
+                className="min-w-[100%] sm:min-w-[50%] md:min-w-[33.333%] lg:min-w-[25%] xl:min-w-[20%] flex-shrink-0 snap-start px-1"
+              >
+                <ProductCard product={product} />
+              </div>
             ))}
           </div>
-          <button className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md">
+          <button className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-10">
             <ChevronLeft className="h-6 w-6" />
           </button>
-          <button className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md">
+
+          <button className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-10">
+            <ChevronRight className="h-6 w-6" />
+          </button>
+
+        </div>
+      </section>
+
+      {/* Phone Products */}
+      <section className="bg-phone-bg p-4 my-4 mx-auto max-w-5xl rounded-lg">
+        <h2 className="text-lg font-semibold mb-4">Phone</h2>
+        <div className="relative">
+          <div className="flex overflow-x-auto space-x-4 pb-4 snap-x snap-mandatory scrollbar-hide">
+            <div className="flex w-full">
+              {/* PhoneProductsSection will be modified to match this layout */}
+              <PhoneProductsSection />
+            </div>
+          </div>
+          <button className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-10">
+            <ChevronLeft className="h-6 w-6" />
+          </button>
+          <button className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-10">
             <ChevronRight className="h-6 w-6" />
           </button>
         </div>
       </section>
 
-      {/* Phone Products */}
-      <section className="bg-phone-bg p-4 my-4 mx-4 rounded-lg">
-        <h2 className="text-lg font-semibold mb-4">Phone</h2>
-        <PhoneProductsSection />
-      </section>
-
       {/* Laptop Products */}
-      <section className="bg-secondary p-4 my-4 mx-4 rounded-lg">
+      <section className="bg-secondary p-4 my-4 mx-auto max-w-5xl rounded-lg">
         <h2 className="text-lg font-semibold mb-4">Laptop</h2>
         <div className="relative">
-          <div className="flex overflow-x-auto space-x-4 pb-4">
-            {laptopProducts.map((product, index) => (
-              <ProductCard key={index} product={product} />
-            ))}
+          <div className="flex overflow-x-auto space-x-4 pb-4 snap-x snap-mandatory scrollbar-hide">
+            <div className="flex w-full">
+              {laptopProducts.map((product, index) => (
+                <div
+                  key={index}
+                  className="min-w-[100%] sm:min-w-[50%] md:min-w-[33.333%] lg:min-w-[25%] xl:min-w-[20%] flex-shrink-0 snap-start px-1"
+                >
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
           </div>
+
           <button className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md">
             <ChevronLeft className="h-6 w-6" />
           </button>
+
           <button className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md">
             <ChevronRight className="h-6 w-6" />
           </button>
+
         </div>
       </section>
 

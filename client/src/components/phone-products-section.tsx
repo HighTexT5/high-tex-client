@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
 import PhoneCard from "@/components/phone-card"
 
 interface PhoneProduct {
@@ -110,7 +109,7 @@ export default function PhoneProductsSection() {
   }
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       {isLoading ? (
         <div className="flex justify-center items-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -123,25 +122,23 @@ export default function PhoneProductsSection() {
               <p>Lỗi kết nối API: Đang hiển thị dữ liệu mẫu</p>
             </div>
           )}
-        <div className="flex overflow-x-auto space-x-4 pb-4">
+        <div className="flex w-full">
             {phoneProducts.map((product) => (
-              <PhoneCard
+              <div
                 key={product.id}
-                product={{
-                  name: product.name,
-                  price: formatPrice(product.price),
-                  rating: product.rating.toString(),
-                  image: product.imageURL || "/placeholder.svg?height=150&width=150",
-                }}
-              />
+                className="min-w-[100%] sm:min-w-[50%] md:min-w-[33.333%] lg:min-w-[25%] xl:min-w-[20%] flex-shrink-0 snap-start px-1"
+              >
+                <PhoneCard
+                  product={{
+                    name: product.name,
+                    price: formatPrice(product.price),
+                    rating: product.rating.toString(),
+                    image: product.imageURL || "/placeholder.svg?height=150&width=150",
+                  }}
+                />
+              </div>
             ))}
           </div>
-          <button className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md">
-            <ChevronLeft className="h-6 w-6" />
-          </button>
-          <button className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md">
-            <ChevronRight className="h-6 w-6" />
-          </button>
         </>
       )}
     </div>
