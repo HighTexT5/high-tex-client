@@ -275,7 +275,7 @@ export default function Navbar() {
 
   return (
     <nav className="bg-secondary text-black relative z-10 w-full">
-      <div className="flex w-full">
+      <div className="max-w-6xl mx-auto flex justify-center">
         {navCategories.map((category, index) => (
           <div key={index} className="group static">
             <Link

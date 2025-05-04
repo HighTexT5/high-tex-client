@@ -116,19 +116,18 @@ export default function PhoneProductsSection() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           <span className="ml-2">Đang tải sản phẩm...</span>
         </div>
-      ) : error ? (
-        <div className="bg-red-50 text-red-500 p-4 rounded-md">
-          <p>Có lỗi xảy ra: {error}</p>
-          <p className="text-sm mt-2">Đang hiển thị dữ liệu mẫu</p>
-        </div>
       ) : (
         <>
-          <div className="flex overflow-x-auto space-x-4 pb-4">
+          {error && (
+            <div className="bg-red-50 text-red-500 p-2 rounded-md mb-4 text-sm">
+              <p>Lỗi kết nối API: Đang hiển thị dữ liệu mẫu</p>
+            </div>
+          )}
+        <div className="flex overflow-x-auto space-x-4 pb-4">
             {phoneProducts.map((product) => (
               <PhoneCard
                 key={product.id}
                 product={{
-                  id: product.id, // Make sure to pass the ID
                   name: product.name,
                   price: formatPrice(product.price),
                   rating: product.rating.toString(),

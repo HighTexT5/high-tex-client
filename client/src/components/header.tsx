@@ -213,9 +213,9 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-[#0A2463] text-white p-4 flex items-center justify-between">
-      <div className="flex items-center">
-        <Link href="/" className="flex items-center mr-8 text-white">
+    <header className="bg-[#0A2463] text-white p-4">
+      <div className="max-w-6xl mx-auto flex items-center justify-center gap-4">
+        <Link href="/" className="flex items-center text-white">
           <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center mr-2">
             <span className="text-accent-yellow font-bold text-xl">?</span>
           </div>
@@ -224,15 +224,14 @@ export default function Header() {
 
         <Button
           variant="outline"
-          className="mr-2 bg-[#0A2463] border-white text-white hover:bg-[#2962FF] h-9 cursor-pointer"
+          className="bg-[#0A2463] border-white text-white hover:bg-[#2962FF] h-9 cursor-pointer"
           onClick={handleSellerClick}
         >
           Kênh người bán
         </Button>
-      </div>
 
-      <div className="flex-1 max-w-md mx-4 relative">
-      <Input placeholder="Value" className="pr-10 border-gray-600 text-black bg-white" />
+      <div className="relative w-64">
+          <Input placeholder="Tìm kiếm" className="pr-10 border-gray-600 text-black bg-white h-9" />
         <div className="absolute right-0 top-0 h-full flex items-center pr-3">
           <span className="text-gray-600 cursor-pointer">×</span>
         </div>
@@ -244,17 +243,17 @@ export default function Header() {
         </Button>
       </div>
 
-      <div className="flex items-center">
         <Button
           variant="outline"
-          className="mr-2 bg-[#0A2463] text-white border-white hover:bg-[#2962FF] h-9 cursor-pointer"
+          className="bg-[#0A2463] text-white border-white hover:bg-[#2962FF] h-9 cursor-pointer whitespace-nowrap"
         >
           Tra cứu đơn hàng
         </Button>
+
         <div className="relative">
           <Button
             variant="outline"
-            className="mr-2 bg-[#0A2463] text-white border-white hover:bg-[#2962FF] h-9 w-9 p-0 cursor-pointer"
+            className="bg-[#0A2463] text-white border-white hover:bg-[#2962FF] h-9 w-9 p-0 cursor-pointer"
             onClick={handleCartClick}
             disabled={isCartLoading}
           >
