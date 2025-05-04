@@ -1,7 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import type React from "react"
+
+import { useState, useEffect, useRef } from "react"
 import PhoneCard from "@/components/phone-card"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+
 
 interface PhoneProduct {
   id: number
@@ -23,7 +27,48 @@ export default function PhoneProductsSection() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const phoneScrollRef = useRef<HTMLDivElement>(null)
+
+  const [phoneScrollPosition, setPhoneScrollPosition] = useState(0)
+  const [phoneMaxScroll, setPhoneMaxScroll] = useState(0)
+
+  // Calculate item width based on viewport - now returns fixed width
+  const getItemWidth = () => {
+    return 184 + 16 // Item width (184px) + spacing (16px)
+  }
+
+  // Scroll one item left or right
+    const scrollOneItem = (
+      direction: "left" | "right",
+      scrollRef: React.RefObject<HTMLDivElement>,
+      setScrollPosition: React.Dispatch<React.SetStateAction<number>>,
+    ) => {
+      if (!scrollRef.current) return
+  
+      const containerWidth = scrollRef.current.clientWidth
+      const itemWidth = getItemWidth()
+      const scrollAmount = direction === "left" ? -itemWidth : itemWidth
+  
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" })
+    }
+
   useEffect(() => {
+
+    const updateScrollInfo = () => {
+      if (phoneScrollRef.current) {
+        setPhoneScrollPosition(phoneScrollRef.current.scrollLeft)
+        setPhoneMaxScroll(phoneScrollRef.current.scrollWidth - phoneScrollRef.current.clientWidth)
+      }
+    }
+
+    // Initial update
+    updateScrollInfo()
+
+    // Add scroll event listeners
+    phoneScrollRef.current?.addEventListener("scroll", updateScrollInfo)
+
+    
+
     const fetchPhoneProducts = async () => {
       setIsLoading(true)
       setError(null)
@@ -101,6 +146,11 @@ export default function PhoneProductsSection() {
     }
 
     fetchPhoneProducts()
+
+    return () => {
+      phoneScrollRef.current?.removeEventListener("scroll", updateScrollInfo)
+    }
+    
   }, [])
 
   // Format price to Vietnamese currency format
@@ -122,22 +172,41 @@ export default function PhoneProductsSection() {
               <p>Lỗi kết nối API: Đang hiển thị dữ liệu mẫu</p>
             </div>
           )}
-        <div className="flex w-full">
-            {phoneProducts.map((product) => (
-              <div
-                key={product.id}
-                className="min-w-[100%] sm:min-w-[50%] md:min-w-[33.333%] lg:min-w-[25%] xl:min-w-[20%] flex-shrink-0 snap-start px-1"
+          <div className="relative">
+            <div
+              ref={phoneScrollRef}
+              className="flex overflow-x-auto space-x-4 pb-4 snap-x snap-mandatory scrollbar-hide"
+            >
+              {phoneProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="min-w-[184px] w-[184px] flex-shrink-0 snap-start"
+                >
+                  <PhoneCard
+                    product={{
+                      name: product.name,
+                      price: formatPrice(product.price),
+                      rating: product.rating.toString(),
+                      image: product.imageURL || "/placeholder.svg?height=150&width=150",
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+            <button
+                className={`absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-10 ${phoneScrollPosition <= 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"}`}
+                onClick={() => scrollOneItem("left", phoneScrollRef, setPhoneScrollPosition)}
+                disabled={phoneScrollPosition <= 0}
               >
-                <PhoneCard
-                  product={{
-                    name: product.name,
-                    price: formatPrice(product.price),
-                    rating: product.rating.toString(),
-                    image: product.imageURL || "/placeholder.svg?height=150&width=150",
-                  }}
-                />
-              </div>
-            ))}
+                <ChevronLeft className="h-6 w-6" />
+              </button>
+              <button
+                className={`absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-10 ${phoneScrollPosition >= phoneMaxScroll ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"}`}
+                onClick={() => scrollOneItem("right", phoneScrollRef, setPhoneScrollPosition)}
+                disabled={phoneScrollPosition >= phoneMaxScroll}
+              >
+                <ChevronRight className="h-6 w-6" />
+              </button>
           </div>
         </>
       )}
