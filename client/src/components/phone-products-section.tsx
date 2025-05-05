@@ -38,7 +38,7 @@ export default function PhoneProductsSection() {
   }
 
   // Scroll one item left or right
-    const scrollOneItem = (
+    const scrollPhoneItem = (
       direction: "left" | "right",
       scrollRef: React.RefObject<HTMLDivElement>,
       setScrollPosition: React.Dispatch<React.SetStateAction<number>>,
@@ -101,43 +101,59 @@ export default function PhoneProductsSection() {
         setPhoneProducts([
           {
             id: 1,
-            name: "Samsung Galaxy S25 Ultra 12GB 1TB",
+            name: "Iphone 15 Pro",
             price: 41490000,
             quantity: 96,
             rating: 5,
-            imageURL: "/placeholder.svg?height=150&width=150",
+            imageURL: "/smartphone/homepage/1.png",
           },
           {
             id: 2,
-            name: "iPhone 15 Pro Max 1TB",
+            name: "Asus ROG Phone 7",
             price: 39990000,
             quantity: 45,
             rating: 4.9,
-            imageURL: "/placeholder.svg?height=150&width=150",
+            imageURL: "/smartphone/homepage/2.png",
           },
           {
             id: 3,
-            name: "Xiaomi 14 Ultra",
+            name: "OnePlus 11",
             price: 25990000,
             quantity: 120,
             rating: 4.8,
-            imageURL: "/placeholder.svg?height=150&width=150",
+            imageURL: "/smartphone/homepage/3.png",
           },
           {
             id: 4,
-            name: "Google Pixel 8 Pro",
+            name: "Samsung Galaxy S23",
             price: 22990000,
             quantity: 60,
             rating: 4.7,
-            imageURL: "/placeholder.svg?height=150&width=150",
+            imageURL: "/smartphone/homepage/4.png",
           },
           {
             id: 5,
-            name: "OPPO Find X7 Ultra",
+            name: "Samsung Z Flip 5",
             price: 24990000,
             quantity: 75,
             rating: 4.6,
-            imageURL: "/placeholder.svg?height=150&width=150",
+            imageURL: "/smartphone/homepage/5.png",
+          },
+          {
+            id: 6,
+            name: "Google Pixel 7",
+            price: 5990000,
+            quantity: 20,
+            rating: 5,
+            imageURL: "/smartphone/homepage/6.png",
+          },
+          {
+            id: 7,
+            name: "Huawei Nova 11",
+            price: 8590000,
+            quantity: 10,
+            rating: 4.6,
+            imageURL: "/smartphone/homepage/7.png",
           },
         ])
       } finally {
@@ -150,7 +166,7 @@ export default function PhoneProductsSection() {
     return () => {
       phoneScrollRef.current?.removeEventListener("scroll", updateScrollInfo)
     }
-    
+
   }, [])
 
   // Format price to Vietnamese currency format
@@ -195,14 +211,14 @@ export default function PhoneProductsSection() {
             </div>
             <button
                 className={`absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-10 ${phoneScrollPosition <= 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"}`}
-                onClick={() => scrollOneItem("left", phoneScrollRef, setPhoneScrollPosition)}
+                onClick={() => scrollPhoneItem("left", phoneScrollRef, setPhoneScrollPosition)}
                 disabled={phoneScrollPosition <= 0}
               >
                 <ChevronLeft className="h-6 w-6" />
               </button>
               <button
                 className={`absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-10 ${phoneScrollPosition >= phoneMaxScroll ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"}`}
-                onClick={() => scrollOneItem("right", phoneScrollRef, setPhoneScrollPosition)}
+                onClick={() => scrollPhoneItem("right", phoneScrollRef, setPhoneScrollPosition)}
                 disabled={phoneScrollPosition >= phoneMaxScroll}
               >
                 <ChevronRight className="h-6 w-6" />

@@ -64,15 +64,15 @@ export default function ProductDetailPage() {
   const [addToCartError, setAddToCartError] = useState<string | null>(null)
 
   // Add debug info to the state so we can display it on the page
-  const addDebugInfo = (message: string) => {
-    console.log(message)
-    setDebugInfo((prev) => prev + "\n" + message)
-  }
+  // const addDebugInfo = (message: string) => {
+  //   console.log(message)
+  //   setDebugInfo((prev) => prev + "\n" + message)
+  // }
 
   // Run this immediately when component mounts
-  useEffect(() => {
-    addDebugInfo(`Component mounted with slug: ${params.slug}, productId: ${productId || "none"}`)
-  }, [])
+  // useEffect(() => {
+  //   addDebugInfo(`Component mounted with slug: ${params.slug}, productId: ${productId || "none"}`)
+  // }, [])
 
   useEffect(() => {
     const fetchProductDetail = async () => {
@@ -82,7 +82,7 @@ export default function ProductDetailPage() {
       // Check if we have a product ID
       if (!productId) {
         const errorMsg = "No product ID provided in URL"
-        addDebugInfo(errorMsg)
+        // addDebugInfo(errorMsg)
         setError(errorMsg)
 
         // Use fallback data
@@ -94,32 +94,32 @@ export default function ProductDetailPage() {
       }
 
       try {
-        addDebugInfo(`Attempting to fetch product with ID: ${productId}`)
+        // addDebugInfo(`Attempting to fetch product with ID: ${productId}`)
 
         // Replace with your actual API endpoint
         const apiUrl = `http://localhost:8080/api/item/detail?id=${productId}`
-        addDebugInfo(`API URL: ${apiUrl}`)
+        // addDebugInfo(`API URL: ${apiUrl}`)
 
         const response = await fetch(apiUrl)
-        addDebugInfo(`API response status: ${response.status}`)
+        // addDebugInfo(`API response status: ${response.status}`)
 
         if (!response.ok) {
           throw new Error(`API request failed with status ${response.status}`)
         }
 
         const data = await response.json()
-        addDebugInfo(`API response data received: ${JSON.stringify(data).substring(0, 100)}...`)
+        // addDebugInfo(`API response data received: ${JSON.stringify(data).substring(0, 100)}...`)
 
         if (data.status === 200 && data.message === "Success") {
           setProduct(data.data)
           setActiveImage(data.data.thumbnailUrl)
-          addDebugInfo("Successfully set product data from API")
+          // addDebugInfo("Successfully set product data from API")
         } else {
           throw new Error(`API returned error: ${data.message}`)
         }
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : "Failed to fetch product details"
-        addDebugInfo(`Error: ${errorMsg}`)
+        // addDebugInfo(`Error: ${errorMsg}`)
         setError(errorMsg)
 
         // Use fallback data if API fails
@@ -139,7 +139,7 @@ export default function ProductDetailPage() {
             .replace(/\b\w/g, (c) => c.toUpperCase())
         : "Smartphone XYZ2"
 
-      addDebugInfo(`Created fallback product with name: ${productName}`)
+      // addDebugInfo(`Created fallback product with name: ${productName}`)
 
       return {
         id: Number.parseInt(productId as string) || 2,
@@ -155,11 +155,11 @@ export default function ProductDetailPage() {
         currentPrice: 999999.0,
         rating: 0.0,
         fileUrls: [
-          "/placeholder.svg?height=500&width=500",
-          "/placeholder.svg?height=500&width=500",
-          "/placeholder.svg?height=500&width=500",
+          "/smartphone/iphone15pro/2.png",
+          "/smartphone/iphone15pro/3.png",
+          "/smartphone/iphone15pro/4.png",
         ],
-        thumbnailUrl: "/placeholder.svg?height=500&width=500",
+        thumbnailUrl: "/smartphone/iphone15pro/1.png",
         detail: {
           screenSize: 6.5,
           screenResolution: "1080x2400",
@@ -307,14 +307,14 @@ export default function ProductDetailPage() {
         </div>
       )}
 
-      {error && (
+      {/* {error && (
         <div className="container mx-auto px-4 mb-4">
           <div className="bg-red-50 text-red-500 p-3 rounded-md text-sm">
             <p>Lỗi: {error}</p>
             <p>Đang hiển thị dữ liệu mẫu</p>
           </div>
         </div>
-      )}
+      )} */}
 
       {product && (
         <div className="container mx-auto px-4">

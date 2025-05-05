@@ -2,9 +2,9 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 
 export default function LoginPage() {
   const router = useRouter()
+  const pathname = usePathname()
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -72,7 +73,8 @@ export default function LoginPage() {
         console.log('token, user and role retrived')
         // Store username for display in header
         localStorage.setItem("username", d.data.username)
-        localStorage.setItem("token", d.data.token) 
+        localStorage.setItem("token", d.data.token)
+        localStorage.setItem("userRole", d.data.role) 
         console.log(username)
       } else {
         //for logging-only purpose
@@ -82,8 +84,13 @@ export default function LoginPage() {
       // Dispatch a storage event to notify other components
       window.dispatchEvent(new Event("storage"))
 
-      // Redirect to home page after successful login
-      router.push("/")
+      // Redirect based on role
+      const userRole = localStorage.getItem("userRole")
+      if (userRole === "ROLE_ADMIN") {
+        router.push("/admin")
+      } else {
+        router.push("/")
+      }
     } catch (err) {
       console.error("Login error:", err)
       setError(err instanceof Error ? err.message : "Đăng nhập thất bại, vui lòng thử lại")
@@ -91,6 +98,23 @@ export default function LoginPage() {
       setIsLoading(false)
     }
   }
+
+  // Add this useEffect after the existing useEffect
+  useEffect(() => {
+    // Check if we're on the admin page
+    if (pathname && pathname.startsWith("/admin")) {
+      const userRole = localStorage.getItem("userRole")
+
+      // If user doesn't have admin role, redirect to home
+      if (userRole !== "ROLE_ADMIN") {
+        router.push("/")
+        // Show notification after redirect
+        setTimeout(() => {
+          alert("Bạn không có quyền truy cập vào trang này.")
+        }, 100)
+      }
+    }
+  }, [pathname, router])
 
   return (
     <div className="min-h-screen bg-blue-50 flex items-center justify-center p-4">

@@ -15,8 +15,8 @@ interface ProductProps {
 
 export default function ProductCard({ product }: ProductProps) {
   return (
-    <div className="bg-white rounded-lg shadow-sm min-w-[220px] max-w-[220px] overflow-hidden">
-      <div className="p-4">
+    <div className="bg-white rounded-lg shadow-sm w-[190px] h-[320px] overflow-hidden">
+      <div className="p-4 ">
         <div className="flex justify-center mb-2">
           <Image
             src={product.image || "/placeholder.svg"}

@@ -189,7 +189,17 @@ export default function Header() {
   }
 
   const handleSellerClick = () => {
-    router.push("/seller")
+    // Check if user is logged in
+    const token = localStorage.getItem("token")
+    const userRole = localStorage.getItem("userRole")
+
+    // Check if user has the required role
+    if (userRole === "ROLE_ADMIN" || userRole === "ROLE_DISTRIBUTOR") {
+      router.push("/seller")
+    } else {
+      // Show notification and stay on current page
+      alert("Bạn không có quyền truy cập vào kênh người bán")
+    }
   }
 
   const handleMemberClick = () => {
@@ -207,6 +217,23 @@ export default function Header() {
       setUsername(null)
     }
   }
+
+  // Add this useEffect to handle unauthorized access to seller page
+  useEffect(() => {
+    // Check if current path is /seller
+    if (pathname.startsWith("/seller")) {
+      const userRole = localStorage.getItem("userRole")
+
+      // If user doesn't have required role, redirect to home
+      if (userRole !== "ROLE_ADMIN" && userRole !== "ROLE_DISTRIBUTOR") {
+        router.push("/")
+        // Show notification after redirect
+        setTimeout(() => {
+          alert("Bạn không có quyền truy cập vào kênh người bán")
+        }, 100)
+      }
+    }
+  }, [pathname, router])
 
   if (!shouldRender) {
     return null

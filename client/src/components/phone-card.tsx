@@ -35,7 +35,7 @@ export default function PhoneCard({ product }: PhoneProps) {
 
   return (
     <div
-      className="bg-white rounded-lg shadow-sm min-w-[220px] max-w-[220px] overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+      className="bg-white rounded-lg shadow-sm w-[190px] h-[280px] overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
       onClick={handlePhoneClick}
     >
       <div className="p-4">
