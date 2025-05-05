@@ -153,6 +153,7 @@ export default function MemberPage() {
     localStorage.removeItem("data")
     localStorage.removeItem("username")
     localStorage.removeItem("token")
+    localStorage.removeItem("userRole")
 
     // Redirect to home page
     router.push("/")
@@ -194,6 +195,7 @@ export default function MemberPage() {
 
     // Collect all form data
     const formData = {
+      managerName,
       shopName,
       shopWarehouseAddress,
       shopPhone,
@@ -212,9 +214,8 @@ export default function MemberPage() {
           "Content-Type": "application/json",
           ...(token && { Authorization: `Bearer ${token}` })
         },
-        body: JSON.stringify({
-          formData
-        }),
+        body: JSON.stringify(
+          formData),
       })
 
       console.log("API response status:", response.status)

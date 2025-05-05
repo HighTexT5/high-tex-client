@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowLeft, Star, ShoppingCart } from "lucide-react"
@@ -62,6 +63,8 @@ export default function ProductDetailPage() {
   const [isAddingToCart, setIsAddingToCart] = useState(false)
   const [addToCartSuccess, setAddToCartSuccess] = useState(false)
   const [addToCartError, setAddToCartError] = useState<string | null>(null)
+
+  const router = useRouter()
 
   // Add debug info to the state so we can display it on the page
   // const addDebugInfo = (message: string) => {
@@ -421,7 +424,10 @@ export default function ProductDetailPage() {
 
                 <div className="mb-6">
                   <h3 className="font-medium mb-2">Thông tin cửa hàng</h3>
-                  <div className="flex items-center">
+                  <div
+                    className="flex items-center p-2 border rounded-md hover:bg-gray-50 cursor-pointer transition-colors"
+                    onClick={() => router.push(`/${product.shopCode}`)}
+                  >
                     <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-2">
                       <span className="text-sm font-medium">{product.shopName.charAt(0)}</span>
                     </div>

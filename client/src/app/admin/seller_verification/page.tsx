@@ -209,16 +209,16 @@ export default function SellerVerificationPage() {
         // Map the API response to match our expected format
         setSellerDetails({
           id: sellerId,
-          fullName: data.fullName || "Unknown",
-          userCode: data.userCode || "Unknown",
-          shopName: data.shopName || "Unknown",
-          shopWarehouseAddress: data.shopWarehouseAddress || "Unknown",
-          shopPhone: data.shopPhone || "Unknown",
-          shopEmail: data.shopEmail || "Unknown",
-          shopTaxCode: data.shopTaxCode || "Unknown",
-          description: data.description || "No description",
-          createdDate: data.createdDate ? new Date(data.createdDate).toLocaleDateString("vi-VN") : "Unknown",
-          modifiedDate: data.modifiedDate ? new Date(data.modifiedDate).toLocaleDateString("vi-VN") : undefined,
+          fullName: data.data.fullName || "Unknown",
+          userCode: data.data.userCode || "Unknown",
+          shopName: data.data.shopName || "Unknown",
+          shopWarehouseAddress: data.data.shopWarehouseAddress || "Unknown",
+          shopPhone: data.data.shopPhone || "Unknown",
+          shopEmail: data.data.shopEmail || "Unknown",
+          shopTaxCode: data.data.shopTaxCode || "Unknown",
+          description: data.data.description || "No description",
+          createdDate: data.data.createdDate ? new Date(data.data.createdDate).toLocaleDateString("vi-VN") : "Unknown",
+          modifiedDate: data.data.modifiedDate ? new Date(data.data.modifiedDate).toLocaleDateString("vi-VN") : undefined,
         })
       }
     } catch (err) {
