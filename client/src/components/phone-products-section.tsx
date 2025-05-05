@@ -200,6 +200,7 @@ export default function PhoneProductsSection() {
                 >
                   <PhoneCard
                     product={{
+                      id: product.id,
                       name: product.name,
                       price: formatPrice(product.price),
                       rating: product.rating.toString(),

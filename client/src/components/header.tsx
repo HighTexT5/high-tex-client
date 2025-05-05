@@ -105,30 +105,17 @@ export default function Header() {
     } catch (err) {
       console.error("Error fetching cart data:", err)
 
-      // Use example data if API fails
-      const exampleData = {
-        items: [
-          {
-            itemName: "Smartphone XYZ",
-            quantity: 4,
-            currentPrice: 999.99,
-            thumbnailUrl: "https://i.ibb.co/tpQcK667/5e71f2a46ad2.png",
-          },
-          {
-            itemName: "Smartphone XYZ2",
-            quantity: 3,
-            currentPrice: 999999.0,
-            thumbnailUrl: "https://i.ibb.co/G3tnXrwq/0616f75332c6.png",
-          },
-        ],
-        totalPrice: 3003996.96,
+      // Create empty cart data
+      const emptyCartData = {
+        items: [],
+        totalPrice: 0,
       }
 
-      setCartData(exampleData)
-      setCartItemCount(exampleData.items.reduce((total, item) => total + item.quantity, 0))
+      setCartData(emptyCartData)
+      setCartItemCount(0)
 
-      // Store example data in localStorage
-      localStorage.setItem("cartData", JSON.stringify(exampleData))
+      // Store empty cart data in localStorage
+      localStorage.setItem("cartData", JSON.stringify(emptyCartData))
 
       // Navigate to cart page
       router.push("/cart")
@@ -170,6 +157,15 @@ export default function Header() {
         const parsedData = JSON.parse(storedCartData)
         setCartData(parsedData)
         setCartItemCount(parsedData.items.reduce((total: number, item: any) => total + item.quantity, 0))
+      } else {
+        // Create empty cart data if nothing in localStorage
+        const emptyCartData = {
+          items: [],
+          totalPrice: 0,
+        }
+        setCartData(emptyCartData)
+        setCartItemCount(0)
+        localStorage.setItem("cartData", JSON.stringify(emptyCartData))
       }
     }
   }

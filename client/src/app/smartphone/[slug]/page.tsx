@@ -108,52 +108,37 @@ export default function ProductDetailPage() {
         }
 
         const data = await response.json()
+        console.log("API Response:", data)
         // addDebugInfo(`API response data received: ${JSON.stringify(data).substring(0, 100)}...`)
 
-        if (data.status === 200 && data.message === "Success") {
+        if (data && data.data) {
+          // Successfully got data from API
           setProduct(data.data)
-          setActiveImage(data.data.thumbnailUrl)
-          // addDebugInfo("Successfully set product data from API")
+          setActiveImage(data.data.thumbnailUrl || data.data.fileUrls?.[0] || "/placeholder.svg?height=500&width=500")
+          console.log("Product data set from API:", data.data)
         } else {
-          throw new Error(`API returned error: ${data.message}`)
+          throw new Error("API returned invalid data structure")
         }
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : "Failed to fetch product details"
         // addDebugInfo(`Error: ${errorMsg}`)
         setError(errorMsg)
 
-        // Use fallback data if API fails
-        const fallbackProduct = createFallbackProduct()
-        setProduct(fallbackProduct)
-        setActiveImage(fallbackProduct.thumbnailUrl)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    // Create fallback product data
-    const createFallbackProduct = () => {
-      const productName = params.slug
-        ? String(params.slug)
-            .replace(/-/g, " ")
-            .replace(/\b\w/g, (c) => c.toUpperCase())
-        : "Smartphone XYZ2"
-
-      // addDebugInfo(`Created fallback product with name: ${productName}`)
-
-      return {
-        id: Number.parseInt(productId as string) || 2,
-        itemCode: "SM28841743270276718",
-        itemName: productName,
-        shopCode: "SHOP1742835163046",
-        shopName: "Shop Acc2",
-        category: "smartphone",
-        brand: "BrandName",
-        productSource: "Manufacturer",
-        quantity: 97,
-        originPrice: 999999.0,
-        currentPrice: 999999.0,
-        rating: 0.0,
+        // Only use fallback data if absolutely necessary
+        console.log("Using fallback data due to API error")
+        setProduct({
+          id: Number.parseInt(productId || "1"),
+          itemCode: "FALLBACK-" + (productId || "1"),
+          itemName: params.slug ? String(params.slug).replace(/-/g, " ") : "Smartphone",
+          shopCode: "SHOP-FALLBACK",
+          shopName: "Demo Shop",
+          category: "smartphone",
+          brand: "Demo Brand",
+          productSource: "Manufacturer",
+          quantity: 100,
+          originPrice: 1200000.0,
+          currentPrice: 999000.0,
+          rating: 4.5,
         fileUrls: [
           "/smartphone/iphone15pro/2.png",
           "/smartphone/iphone15pro/3.png",
@@ -177,12 +162,20 @@ export default function ProductDetailPage() {
           ram: "12GB",
           battery: "4500mAh",
         },
-      }
+      })
+      setActiveImage("/placeholder.svg?height=500&width=500")
+    } finally {
+      setIsLoading(false)
     }
+  }
 
-    // Start the fetch process
+  if (productId) {
     fetchProductDetail()
-  }, [productId, params.slug])
+  } else {
+    setError("No product ID provided")
+      setIsLoading(false)
+  }
+}, [productId, params.slug])
 
   const handleAddToCart = async () => {
     if (!product) return
@@ -284,6 +277,38 @@ export default function ProductDetailPage() {
       </div>
     )
   }
+
+  if (error && !product) {
+    return (
+      <div className="min-h-screen bg-blue-50 flex flex-col justify-center items-center p-4">
+        <div className="bg-white rounded-lg shadow-sm p-6 max-w-md w-full text-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-12 w-12 text-red-500 mx-auto mb-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <h2 className="text-xl font-semibold mb-2">Không tìm thấy sản phẩm</h2>
+          <p className="text-gray-600 mb-4">
+            Không thể tải thông tin sản phẩm. Vui lòng thử lại sau hoặc quay lại trang chủ.
+          </p>
+          <Link href="/">
+            <Button className="bg-primary text-white hover:bg-primary/90">Quay lại trang chủ</Button>
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  
 
   return (
     <div className="min-h-screen bg-blue-50 pb-12">
