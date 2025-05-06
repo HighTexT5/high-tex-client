@@ -165,9 +165,9 @@ export default function PaymentInfoPage() {
                     <SelectValue placeholder="Chọn tỉnh/thành phố" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="hanoi">Hà Nội</SelectItem>
-                    <SelectItem value="hcm">TP. Hồ Chí Minh</SelectItem>
-                    <SelectItem value="danang">Đà Nẵng</SelectItem>
+                    <SelectItem value="Hà Nội">Hà Nội</SelectItem>
+                    <SelectItem value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</SelectItem>
+                    <SelectItem value="Đà Nẵng">Đà Nẵng</SelectItem>
                     <SelectItem value="other">Khác</SelectItem>
                   </SelectContent>
                 </Select>
@@ -181,9 +181,9 @@ export default function PaymentInfoPage() {
                     <SelectValue placeholder="Chọn quận/huyện" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="district1">Quận 1</SelectItem>
-                    <SelectItem value="district2">Quận 2</SelectItem>
-                    <SelectItem value="district3">Quận 3</SelectItem>
+                    <SelectItem value="Quận 1">Quận 1</SelectItem>
+                    <SelectItem value="Quận 2">Quận 2</SelectItem>
+                    <SelectItem value="Quận 3">Quận 3</SelectItem>
                     <SelectItem value="other">Khác</SelectItem>
                   </SelectContent>
                 </Select>
@@ -199,10 +199,10 @@ export default function PaymentInfoPage() {
                     <SelectValue placeholder="Chọn phường/xã" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="ward1">Phường 1</SelectItem>
-                    <SelectItem value="ward2">Phường 2</SelectItem>
-                    <SelectItem value="ward3">Phường 3</SelectItem>
-                    <SelectItem value="other">Khác</SelectItem>
+                    <SelectItem value="Phường 1">Phường 1</SelectItem>
+                    <SelectItem value="Phường 2">Phường 2</SelectItem>
+                    <SelectItem value="Phường 3">Phường 3</SelectItem>
+                    <SelectItem value="Khác">Khác</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

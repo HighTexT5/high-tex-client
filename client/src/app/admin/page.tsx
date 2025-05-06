@@ -105,7 +105,7 @@ export default function AdminPage() {
           <Category
             title="Bảo mật và pháp lý"
             items={[
-              { name: "xử lý tố cáo", path: "/admin/reports" },
+              { name: "Xử lý tố cáo", path: "/admin/reports" },
               { name: "Thay đổi điều khoản dịch vụ(TOS) và chính sách bảo mật", path: "/admin/terms-privacy" },
             ]}
             isOpen={openCategories.security}

@@ -67,10 +67,10 @@ export default function SellerSidebar({ activePage }: SellerSidebarProps) {
       title: "Quản lý đơn hàng",
       items: [
         { name: "Tất cả đơn hàng", path: "/seller/orders" },
-        { name: "giao hàng loạt", path: "/seller/bulk_shipping" },
-        { name: "đơn hủy", path: "/seller/canceled_orders" },
-        { name: "trả hàng/ hoàn tiền", path: "/seller/returns" },
-        { name: "cài đặt vận chuyển", path: "/seller/shipping_settings" },
+        { name: "Giao hàng loạt", path: "/seller/bulk_shipping" },
+        { name: "Đơn hủy", path: "/seller/canceled_orders" },
+        { name: "Trả hàng/Hoàn tiền", path: "/seller/returns" },
+        { name: "Cài đặt vận chuyển", path: "/seller/shipping_settings" },
       ],
     },
     {
@@ -78,9 +78,9 @@ export default function SellerSidebar({ activePage }: SellerSidebarProps) {
       title: "Quản lý sản phẩm",
       items: [
         { name: "Tất cả sản phẩm", path: "/seller/products" },
-        { name: "thêm sản phẩm", path: "/seller/add_product" },
-        { name: "sản phẩm vi phạm", path: "/seller/violated_products" },
-        { name: "cài đặt sản phẩm", path: "/seller/product_settings" },
+        { name: "Thêm sản phẩm", path: "/seller/add_product" },
+        { name: "Sản phẩm vi phạm", path: "/seller/violated_products" },
+        { name: "Cài đặt sản phẩm", path: "/seller/product_settings" },
       ],
     },
     {
@@ -88,8 +88,8 @@ export default function SellerSidebar({ activePage }: SellerSidebarProps) {
       title: "Tài chính",
       items: [
         { name: "Doanh thu", path: "/seller/revenue" },
-        { name: "số dư TK HighTEx", path: "/seller/balance" },
-        { name: "tài khoản ngân hàng", path: "/seller/bank_accounts" },
+        { name: "Số dư TK HighTEx", path: "/seller/balance" },
+        { name: "Tài khoản ngân hàng", path: "/seller/bank_accounts" },
       ],
     },
     {
@@ -102,8 +102,8 @@ export default function SellerSidebar({ activePage }: SellerSidebarProps) {
       title: "Quản lý phân phối",
       items: [
         { name: "Hồ sơ", path: "/seller/profile" },
-        { name: "thiết lập", path: "/seller/settings" },
-        { name: "đánh giá", path: "/seller/reviews" },
+        { name: "Thiết lập", path: "/seller/settings" },
+        { name: "Đánh giá", path: "/seller/reviews" },
       ],
     },
   ]
