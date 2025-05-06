@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Bell, User, Search, MoreHorizontal } from "lucide-react"
+import { Bell, User, Search, MoreHorizontal, X, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import SellerSidebar from "@/components/seller-sidebar"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -25,6 +25,13 @@ interface Order {
   quantity: number
   totalPrice: number
   status: string
+  userCode?: string // Add userCode to the Order interface
+}
+
+interface UserDetails {
+  fullName: string
+  phoneNumber: number
+  address: string
 }
 
 export default function AllOrdersPage() {
@@ -34,6 +41,13 @@ export default function AllOrdersPage() {
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
+
+  // State for order details modal
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false)
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(null)
+  const [isLoadingUserDetails, setIsLoadingUserDetails] = useState(false)
+  const [userDetailsError, setUserDetailsError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchOrders()
@@ -79,6 +93,7 @@ export default function AllOrdersPage() {
           quantity: 3,
           totalPrice: 2999997.0,
           status: "Pending",
+          userCode: "USER123", 
         },
         {
           orderCode: "ORDER_1743353607238",
@@ -87,6 +102,7 @@ export default function AllOrdersPage() {
           quantity: 1,
           totalPrice: 34990000.0,
           status: "Processing",
+          userCode: "USER456",
         },
         {
           orderCode: "ORDER_1743353607239",
@@ -95,6 +111,7 @@ export default function AllOrdersPage() {
           quantity: 2,
           totalPrice: 52990000.0,
           status: "Shipped",
+          userCode: "USER789",
         },
         {
           orderCode: "ORDER_1743353607240",
@@ -103,6 +120,7 @@ export default function AllOrdersPage() {
           quantity: 1,
           totalPrice: 24990000.0,
           status: "Delivered",
+          userCode: "USER101",
         },
         {
           orderCode: "ORDER_1743353607241",
@@ -111,11 +129,87 @@ export default function AllOrdersPage() {
           quantity: 1,
           totalPrice: 22990000.0,
           status: "Cancelled",
+          userCode: "USER202",
         },
       ])
     } finally {
       setIsLoading(false)
     }
+  }
+
+  // Function to fetch user details
+  const fetchUserDetails = async (userCode: string) => {
+    setIsLoadingUserDetails(true)
+    setUserDetailsError(null)
+
+    try {
+      const token = localStorage.getItem("token")
+      if (!token) {
+        throw new Error("Bạn chưa đăng nhập")
+      }
+
+      const response = await fetch(`http://localhost:8080/api/au/user/get-by-code?userCode=${userCode}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`)
+      }
+
+      const data = await response.json()
+
+      if (data.status === 200 && data.message === "Success" && data.data) {
+        // Extract required fields from the response
+        setUserDetails({
+          fullName: data.data.fullName || "Không có thông tin",
+          phoneNumber: data.data.phoneNumber || 0,
+          address: data.data.address || "Không có địa chỉ",
+        })
+      } else {
+        throw new Error(data.message || "Failed to fetch user details")
+      }
+    } catch (err) {
+      console.error("Error fetching user details:", err)
+      setUserDetailsError(err instanceof Error ? err.message : "Không thể tải thông tin người dùng")
+
+      // Use example data if API fails
+      setUserDetails({
+        fullName: "Nguyễn Văn A",
+        phoneNumber: 1234567890,
+        address: "123 Đường ABC, Quận XYZ, TP. Hồ Chí Minh",
+      })
+    } finally {
+      setIsLoadingUserDetails(false)
+    }
+  }
+
+  // Function to handle opening the details modal
+  const handleViewDetails = (order: Order) => {
+    setSelectedOrder(order)
+    setIsDetailsModalOpen(true)
+
+    // Fetch user details if userCode is available
+    if (order.userCode) {
+      fetchUserDetails(order.userCode)
+    } else {
+      setUserDetailsError("Không có mã người dùng")
+      // Use example data
+      setUserDetails({
+        fullName: "Nguyễn Văn A",
+        phoneNumber: 1234567890,
+        address: "123 Đường ABC, Quận XYZ, TP. Hồ Chí Minh",
+      })
+    }
+  }
+
+  // Function to close the details modal
+  const handleCloseDetailsModal = () => {
+    setIsDetailsModalOpen(false)
+    setSelectedOrder(null)
+    setUserDetails(null)
+    setUserDetailsError(null)
   }
 
   // Format price to Vietnamese currency
@@ -279,9 +373,7 @@ export default function AllOrdersPage() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuLabel>Hành động</DropdownMenuLabel>
-                              <DropdownMenuItem onClick={() => alert(`Xem chi tiết đơn hàng ${order.orderCode}`)}>
-                                Xem chi tiết
-                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleViewDetails(order)}>Xem chi tiết</DropdownMenuItem>
                               <DropdownMenuSeparator />
                               {order.status === "Pending" && (
                                  <DropdownMenuItem
@@ -357,6 +449,158 @@ export default function AllOrdersPage() {
           </div>
         </div>
       </div>
+    {/* Order Details Modal */}
+    {isDetailsModalOpen && selectedOrder && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-semibold">Chi tiết đơn hàng</h3>
+                <button onClick={handleCloseDetailsModal} className="text-gray-500 hover:text-gray-700">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* User Details Section */}
+                <div>
+                  <h4 className="text-lg font-medium mb-3">Thông tin khách hàng</h4>
+
+                  {isLoadingUserDetails ? (
+                    <div className="flex items-center justify-center py-4">
+                      <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                      <span>Đang tải thông tin khách hàng...</span>
+                    </div>
+                  ) : userDetailsError ? (
+                    <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm mb-4">
+                      {userDetailsError}
+                      <p>Đang hiển thị dữ liệu mẫu</p>
+                    </div>
+                  ) : userDetails ? (
+                    <div className="bg-gray-50 p-4 rounded-md">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm text-gray-500">Họ và tên</p>
+                          <p className="font-medium">{userDetails.fullName}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Số điện thoại</p>
+                          <p className="font-medium">{userDetails.phoneNumber}</p>
+                        </div>
+                      </div>
+                      <div className="mt-3">
+                        <p className="text-sm text-gray-500">Địa chỉ</p>
+                        <p className="font-medium">{userDetails.address}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-gray-500">Không có thông tin khách hàng</p>
+                  )}
+                </div>
+
+                {/* Order Details Section */}
+                <div>
+                  <h4 className="text-lg font-medium mb-3">Thông tin đơn hàng</h4>
+                  <div className="bg-gray-50 p-4 rounded-md">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-gray-500">Mã đơn hàng</p>
+                        <p className="font-medium">{selectedOrder.orderCode}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">Trạng thái</p>
+                        <p className="font-medium">
+                          <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(selectedOrder.status)}`}>
+                            {selectedOrder.status}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-4">
+                      <p className="text-sm text-gray-500">Sản phẩm</p>
+                      <div className="mt-2 border rounded-md">
+                        <div className="grid grid-cols-12 bg-gray-100 p-2 text-sm font-medium">
+                          <div className="col-span-6">Tên sản phẩm</div>
+                          <div className="col-span-2 text-center">Mã sản phẩm</div>
+                          <div className="col-span-2 text-center">Số lượng</div>
+                          <div className="col-span-2 text-right">Thành tiền</div>
+                        </div>
+                        <div className="grid grid-cols-12 p-2 text-sm border-t">
+                          <div className="col-span-6">{selectedOrder.itemName}</div>
+                          <div className="col-span-2 text-center">{selectedOrder.itemCode}</div>
+                          <div className="col-span-2 text-center">{selectedOrder.quantity}</div>
+                          <div className="col-span-2 text-right">{formatPrice(selectedOrder.totalPrice)}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex justify-between items-center font-medium">
+                      <span>Tổng tiền:</span>
+                      <span className="text-lg">{formatPrice(selectedOrder.totalPrice)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end space-x-3 mt-4">
+                  <Button variant="outline" onClick={handleCloseDetailsModal}>
+                    Đóng
+                  </Button>
+
+                  {selectedOrder.status === "Pending" && (
+                    <Button
+                      className="bg-primary text-white"
+                      onClick={async () => {
+                        try {
+                          const token = localStorage.getItem("token")
+                          if (!token) {
+                            alert("Bạn chưa đăng nhập")
+                            return
+                          }
+
+                          // Show loading notification
+                          alert("Đang xác nhận đơn hàng...")
+
+                          const response = await fetch("http://localhost:8080/api/order/distributor/accept-order", {
+                            method: "POST",
+                            headers: {
+                              "Content-Type": "application/json",
+                              Authorization: `Bearer ${token}`,
+                            },
+                            body: JSON.stringify({
+                              orderCode: selectedOrder.orderCode,
+                            }),
+                          })
+
+                          const data = await response.json()
+
+                          // Show response from API as notification
+                          if (response.ok && data.status === 200) {
+                            alert(`Thành công: ${data.message}`)
+                            // Close modal and refresh orders list
+                            handleCloseDetailsModal()
+                            fetchOrders()
+                          } else {
+                            alert(`Lỗi: ${data.message || "Không thể xác nhận đơn hàng"}`)
+                          }
+                        } catch (error) {
+                          console.error("Error confirming order:", error)
+                          alert(
+                            `Đã xảy ra lỗi: ${error instanceof Error ? error.message : "Không thể xác nhận đơn hàng"}`,
+                          )
+                        }
+                      }}
+                    >
+                      Xác nhận đơn hàng
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
