@@ -439,7 +439,108 @@ export default function ProductDetailPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <Button className="w-full bg-primary text-white hover:bg-primary/90 h-12">Mua ngay</Button>
+                <Button
+                    className="w-full bg-primary text-white hover:bg-primary/90 h-12"
+                    onClick={() => {
+                      // Check if user is logged in
+                      const token = localStorage.getItem("token")
+                      if (!token) {
+                        // Show notification
+                        alert("Bạn chưa đăng nhập")
+                        // Navigate to login page
+                        router.push("/login")
+                        return
+                      }
+
+                      // User is logged in, add item to cart
+                      if (!product) return
+
+                      // Show loading state
+                      setIsAddingToCart(true)
+
+                      // Add to cart using the same API as handleAddToCart
+                      fetch("http://localhost:8080/api/shopping-cart/add", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                          Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({
+                          itemCode: product.itemCode,
+                          quantity: 1,
+                        }),
+                      })
+                        .then((response) => {
+                          if (!response.ok) {
+                            throw new Error(`API request failed with status ${response.status}`)
+                          }
+                          return response.json()
+                        })
+                        .then((data) => {
+                          if (data.status === 200 && data.message === "Success") {
+                            // Update cart data in localStorage
+                            const cartDataString = localStorage.getItem("cartData")
+                            if (cartDataString) {
+                              try {
+                                const cartData = JSON.parse(cartDataString)
+
+                                // Check if item already exists in cart
+                                const existingItemIndex = cartData.items.findIndex(
+                                  (item: any) => item.itemCode === product.itemCode,
+                                )
+
+                                if (existingItemIndex >= 0) {
+                                  // Update quantity if item exists
+                                  cartData.items[existingItemIndex].quantity += 1
+                                } else {
+                                  // Add new item if it doesn't exist
+                                  cartData.items.push({
+                                    itemName: product.itemName,
+                                    quantity: 1,
+                                    currentPrice: product.currentPrice,
+                                    thumbnailUrl: product.thumbnailUrl,
+                                  })
+                                }
+
+                                // Update total price
+                                cartData.totalPrice = cartData.items.reduce(
+                                  (total: number, item: any) => total + item.currentPrice * item.quantity,
+                                  0,
+                                )
+
+                                localStorage.setItem("cartData", JSON.stringify(cartData))
+
+                                // Trigger storage event to update cart count in header
+                                window.dispatchEvent(new Event("storage"))
+                              } catch (err) {
+                                console.error("Error updating cart data in localStorage:", err)
+                              }
+                            }
+
+                            // Navigate to cart page
+                            router.push("/cart")
+                          } else {
+                            throw new Error(data.message || "Failed to add item to cart")
+                          }
+                        })
+                        .catch((err) => {
+                          console.error("Error adding to cart:", err)
+                          alert("Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại sau.")
+                        })
+                        .finally(() => {
+                          setIsAddingToCart(false)
+                        })
+                    }}
+                  >
+                    {isAddingToCart ? (
+                      <>
+                        <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                        Đang xử lý...
+                      </>
+                    ) : (
+                      "Mua ngay"
+                    )}
+                  </Button>
                   <Button
                     variant="outline"
                     className="w-full border-primary text-primary hover:bg-primary/10 h-12"

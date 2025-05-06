@@ -25,6 +25,16 @@ export default function PaymentPage() {
   const [paymentMethod, setPaymentMethod] = useState("cod")
   const [isLoading, setIsLoading] = useState(false)
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo | null>(null)
+  const [cartData, setCartData] = useState<{
+    items: Array<{
+      itemCode: string
+      itemName: string
+      quantity: number
+      currentPrice: number
+      thumbnailUrl: string
+    }>
+    totalPrice: number
+  } | null>(null)
 
   // States for order result
   const [orderSuccess, setOrderSuccess] = useState(false)
@@ -45,6 +55,26 @@ export default function PaymentPage() {
     } else {
       // No shipping info found, redirect back to shipping page
       router.push("/cart/payment-info")
+    }
+
+    // Get cart data from localStorage
+    const cartDataString = localStorage.getItem("cartData")
+    if (cartDataString) {
+      try {
+        const parsedCartData = JSON.parse(cartDataString)
+        setCartData(parsedCartData)
+      } catch (error) {
+        console.error("Error parsing cart data:", error)
+        setCartData({
+          items: [],
+          totalPrice: 0,
+        })
+      }
+    } else {
+      setCartData({
+        items: [],
+        totalPrice: 0,
+      })
     }
   }, [router])
 
@@ -271,7 +301,13 @@ export default function PaymentPage() {
         <div className="container mx-auto flex justify-between items-center">
           <div>
             <div className="text-sm text-gray-500">Tổng tiền</div>
-            <div className="font-semibold">{formatPrice(shippingInfo?.totalAmount || 0)}</div>
+            <div className="font-semibold">
+              {shippingInfo
+                ? formatPrice(shippingInfo.totalAmount)
+                : cartData
+                  ? formatPrice(cartData.totalPrice)
+                  : "0đ"}
+            </div>
           </div>
           <Button className="bg-accent text-black border-accent" onClick={handlePayment} disabled={isLoading}>
             {isLoading ? (

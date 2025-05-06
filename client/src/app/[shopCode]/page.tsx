@@ -179,7 +179,7 @@ export default function ShopPage() {
 
         {/* Shop Products */}
         <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-xl font-semibold mb-6">Sản phẩm của cửa hàng</h2>
+          <h2 className="text-xl font-semibold mb-6">Sản phẩm</h2>
 
           {shopProducts.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">

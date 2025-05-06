@@ -27,18 +27,16 @@ export default function PaymentInfoPage() {
   const [address, setAddress] = useState("")
   const [notes, setNotes] = useState("")
 
-  // Cart data
-  const [cartItems, setCartItems] = useState([
-    {
-      id: "1",
-      name: "Chuột chơi game không dây Dareu EM911x RGB Đen",
-      description: "",
-      price: 490000,
-      originalPrice: 699000,
-      image: "/placeholder.svg?height=100&width=100",
-      quantity: 1,
-    },
-  ])
+  const [cartData, setCartData] = useState<{
+    items: Array<{
+      itemCode: string
+      itemName: string
+      quantity: number
+      currentPrice: number
+      thumbnailUrl: string
+    }>
+    totalPrice: number
+  } | null>(null)
 
   useEffect(() => {
     // Check if user is logged in
@@ -48,16 +46,34 @@ export default function PaymentInfoPage() {
 
       // In a real app, you would fetch the user's phone number from an API
       // For now, we'll use a placeholder
-      setPhoneNumber("0123456789")
+
+      // Get cart data from localStorage
+      const cartDataString = localStorage.getItem("cartData")
+      if (cartDataString) {
+        try {
+          const parsedCartData = JSON.parse(cartDataString)
+          setCartData(parsedCartData)
+        } catch (err) {
+          console.error("Error parsing cart data from localStorage:", err)
+          // Set default empty cart data
+          setCartData({
+            items: [],
+            totalPrice: 0,
+          })
+        }
+      } else {
+        // No cart data found
+        setCartData({
+          items: [],
+          totalPrice: 0,
+        })
+      }
     } else {
       // Redirect to login if not logged in
       router.push("/login")
     }
   }, [router])
-
-  const calculateTotal = () => {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
-  }
+  
 
   const formatPrice = (price: number) => {
     return price.toLocaleString("vi-VN") + "đ"
@@ -227,7 +243,7 @@ export default function PaymentInfoPage() {
         <div className="container mx-auto flex justify-between items-center">
           <div>
             <div className="text-sm text-gray-500">Tổng tiền</div>
-            <div className="font-semibold">{formatPrice(calculateTotal())}</div>
+            <div className="font-semibold">{cartData ? formatPrice(cartData.totalPrice) : "0đ"}</div>
           </div>
           <Button
             type="button"
@@ -330,7 +346,7 @@ export default function PaymentInfoPage() {
                 ward,
                 address,
                 notes,
-                totalAmount: calculateTotal(),
+                totalAmount: cartData ? cartData.totalPrice : 0,
                 addressCode, // Include the addressCode
               }
               localStorage.setItem("shippingInfo", JSON.stringify(shippingInfo))
