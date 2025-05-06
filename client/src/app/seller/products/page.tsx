@@ -138,7 +138,7 @@ export default function ProductsPage() {
         throw new Error("Bạn chưa đăng nhập")
       }
 
-      const response = await fetch(`/api/item/detail?id=${productId}`, {
+      const response = await fetch(`http://localhost:8080/api/item/detail?id=${productId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
